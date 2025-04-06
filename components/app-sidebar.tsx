@@ -166,28 +166,9 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
         </div>
       </div>
 
-      {/* Barra de navegación inferior para móvil */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 h-16 bg-white border-t">
-        <div className="flex items-center justify-around h-full px-2">
-          {routes.map((route) => (
-            <MobileNavItem
-              key={route.href}
-              icon={route.icon}
-              label={route.label}
-              href={route.href}
-              isActive={pathname === route.href}
-            />
-          ))}
-          <div className="flex flex-col items-center justify-center">
-            <UserButton afterSignOutUrl="/" />
-            <span className="text-xs mt-1 text-slate-500">Cuenta</span>
-          </div>
-        </div>
-      </div>
-
       {/* Espaciadores para contenido */}
-      <div className="h-12 lg:hidden" /> {/* Espaciador superior */}
-      <div className="h-16 lg:hidden pb-4" /> {/* Espaciador inferior */}
+      <div className="h-6 lg:hidden" /> {/* Espaciador superior */}
+      <div className="h-8 lg:hidden pb-4" /> {/* Espaciador inferior */}
     </>
   );
 };
