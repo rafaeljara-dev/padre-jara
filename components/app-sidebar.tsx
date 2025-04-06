@@ -32,8 +32,8 @@ const SidebarItem = ({
       href={href}
       onClick={onItemClick}
       className={cn(
-        "flex items-center gap-x-2 text-slate-500 text-sm font-medium px-3 py-2 rounded-lg transition-all hover:text-slate-900 hover:bg-slate-100",
-        isActive && "text-slate-900 bg-slate-100"
+        "flex items-center gap-x-2 text-muted-foreground text-sm font-medium px-3 py-2 rounded-lg transition-all hover:text-foreground hover:bg-accent",
+        isActive && "text-accent-foreground bg-accent font-semibold"
       )}
     >
       <div className="flex items-center gap-x-2">
@@ -76,15 +76,15 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
   ];
 
   const sidebarContent = (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-x-2 px-3 py-4">
         <Avatar>
           <AvatarImage src="/logo.png" alt="Logo" />
-          <AvatarFallback>RJ</AvatarFallback>
+          <AvatarFallback className="bg-primary text-primary-foreground">RJ</AvatarFallback>
         </Avatar>
         <div className="font-semibold text-lg">Bienvenido</div>
       </div>
-      <Separator />
+      <Separator className="bg-sidebar-border" />
       <div className="flex-1 my-4">
         <div className="flex flex-col gap-y-1 px-3">
           {routes.map((route) => (
@@ -99,9 +99,9 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
           ))}
         </div>
       </div>
-      <Separator />
+      <Separator className="bg-sidebar-border" />
       <div className="px-3 py-4 flex items-center justify-between">
-        <p className="text-sm text-slate-500">Mi cuenta</p>
+        <p className="text-sm text-muted-foreground">Mi cuenta</p>
         <UserButton afterSignOutUrl="/" />
       </div>
     </div>
@@ -115,7 +115,7 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
   return (
     <>
       {/* Cabecera móvil */}
-      <div className="lg:hidden fixed z-50 flex items-center justify-between px-2 h-12 w-full bg-white border-b">
+      <div className="lg:hidden fixed z-50 flex items-center justify-between px-2 h-12 w-full bg-card border-b border-border">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="lg:hidden">

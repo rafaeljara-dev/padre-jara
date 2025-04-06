@@ -43,41 +43,72 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/**
+ * Color scheme definition based on client requirements
+ * Base Colors: clean, accessible and easy on the eyes
+ * Action Colors: vibrant and clear for user interactions
+ */
+
 :root {
+  /* Base radius */
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  
+  /* Base Colors */
+  --background: #FAFAFA;        /* Fondo principal - blanco suave */
+  --foreground: #333333;        /* Texto principal - gris oscuro */
+  --card: #FFFFFF;              /* Fondo de tarjetas - blanco */
+  --card-foreground: #333333;   /* Texto en tarjetas - gris oscuro */
+  --popover: #FFFFFF;           /* Fondos emergentes - blanco */
+  --popover-foreground: #333333; /* Texto emergente - gris oscuro */
+  
+  /* Action Colors */
+  --primary: #1E90FF;           /* Color primario - azul claro */
+  --primary-foreground: #FFFFFF; /* Texto sobre primario - blanco */
+  --primary-hover: #1565C0;     /* Hover de primario - azul oscuro */
+  
+  --secondary: #F5F5F5;         /* Color secundario - gris muy claro */
+  --secondary-foreground: #333333; /* Texto sobre secundario - gris oscuro */
+  
+  --muted: #F0F0F0;             /* Elementos atenuados - gris muy claro */
+  --muted-foreground: #666666;  /* Texto secundario - gris medio */
+  
+  --accent: #E8F4FD;            /* Acentos - azul muy claro */
+  --accent-foreground: #1E90FF; /* Texto de acento - azul claro */
+  
+  /* Estados */
+  --destructive: #F44336;       /* Errores/eliminación - rojo claro */
+  --destructive-foreground: #FFFFFF; /* Texto sobre destructivo */
+  
+  --success: #4CAF50;           /* Éxito - verde suave */
+  --success-foreground: #FFFFFF; /* Texto sobre éxito */
+  
+  --warning: #FFC107;           /* Advertencia - amarillo claro */
+  --warning-foreground: #333333; /* Texto sobre advertencia */
+  
+  /* Otros elementos */
+  --border: #E0E0E0;            /* Bordes/separadores - gris claro */
+  --input: #E0E0E0;             /* Bordes de inputs */
+  --ring: #1E90FF;              /* Anillo de focus */
+  
+  /* Sidebar específicos - mantener coherencia con el diseño principal */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #333333;
+  --sidebar-primary: #1E90FF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E8F4FD;
+  --sidebar-accent-foreground: #1E90FF;
+  --sidebar-border: #E0E0E0;
+  --sidebar-ring: #1E90FF;
+  
+  /* Colores de gráficos - mantener los originales por ahora */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* Mantener modo oscuro con tema base por ahora */
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -119,4 +150,40 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Estilos personalizados para botones */
+.btn {
+  @apply bg-primary text-primary-foreground rounded-lg text-lg px-6 py-3 hover:bg-[#1565C0] transition-colors;
+}
+
+/* Estilos personalizados para tarjetas */
+.card-custom {
+  @apply bg-card border-border rounded-lg shadow-sm;
+}
+
+/* Estilos personalizados para textos */
+.text-success {
+  @apply text-[#4CAF50];
+}
+
+.text-warning {
+  @apply text-[#FFC107];
+}
+
+.text-error {
+  @apply text-[#F44336];
+}
+
+/* Fondos de estado */
+.bg-success-light {
+  @apply bg-[#E8F5E9];
+}
+
+.bg-warning-light {
+  @apply bg-[#FFF8E1];
+}
+
+.bg-error-light {
+  @apply bg-[#FFEBEE];
 }
