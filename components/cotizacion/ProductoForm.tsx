@@ -97,7 +97,16 @@ export const ProductoForm = ({
     return (
         <Card>
             <CardHeader>
-                <CardTitle>{productoEnEdicion ? "Editar producto" : "Agregar producto"}</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2">
+                    <span className="inline-flex p-1.5 rounded-full bg-emerald-100 text-emerald-700">
+                        {productoEnEdicion ? (
+                            <Pencil size={14} />
+                        ) : (
+                            <PlusCircle size={14} />
+                        )}
+                    </span>
+                    {productoEnEdicion ? "Editar producto" : "Agregar producto"}
+                </CardTitle>
                 <CardDescription>
                     {productoEnEdicion
                         ? "Modifique los detalles del producto seleccionado"
@@ -109,7 +118,7 @@ export const ProductoForm = ({
                     <Label htmlFor="nombreProducto" className={camposConError.nombre ? "text-amber-500 font-medium" : ""}>Nombre del producto</Label>
                     <Input
                         id="nombreProducto"
-                        placeholder="Ej. Laptop HP"
+                        placeholder="Nombre del producto"
                         value={nuevoProducto.nombre}
                         onChange={(e) => handleInputChange('nombre', e.target.value)}
                         className={camposConError.nombre ? "border-2 border-amber-500 shadow-sm shadow-amber-200" : ""}

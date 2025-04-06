@@ -1,19 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card";
-import { Trash2, AlertTriangle, CheckCircle, XCircle, FileText } from "lucide-react";
+import { Trash2, AlertTriangle, CheckCircle, XCircle, FileText, Hammer } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 
-import { 
-  DatosCotizacion, 
+import {
+  DatosCotizacion,
   ProductoItem,
   generarPDF,
   generarVistaPreviaURL
@@ -44,16 +44,16 @@ const CotizacionesPage = () => {
 
   // Estado para controlar el diálogo de vista previa
   const [vistaPrevia, setVistaPrevia] = useState(false);
-  
+
   // Estado para almacenar la URL de la vista previa del PDF
   const [pdfURL, setPdfURL] = useState<string>('');
-  
+
   // Estado para indicar si se está cargando la vista previa
   const [cargandoVistaPrevia, setCargandoVistaPrevia] = useState(false);
 
   // Estado para controlar si estamos editando un producto existente
   const [productoEnEdicion, setProductoEnEdicion] = useState<string | null>(null);
-  
+
   // Estado para animación de confirmación
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -79,13 +79,13 @@ const CotizacionesPage = () => {
       // Estamos editando un producto existente
       setCotizacion({
         ...cotizacion,
-        productos: cotizacion.productos.map(p => 
-          p.id === productoEnEdicion 
-            ? { ...nuevoProducto, id: productoEnEdicion } 
+        productos: cotizacion.productos.map(p =>
+          p.id === productoEnEdicion
+            ? { ...nuevoProducto, id: productoEnEdicion }
             : p
         )
       });
-      
+
       setProductoEnEdicion(null);
       toast.success("¡Producto actualizado correctamente!", {
         style: { backgroundColor: "#E8F5E9", color: "#22C55E", borderColor: "#22C55E" },
@@ -131,7 +131,7 @@ const CotizacionesPage = () => {
         precio: producto.precio
       });
       setProductoEnEdicion(id);
-      
+
       // Hacer scroll al formulario de edición
       window.scrollTo({
         top: 0,
@@ -156,7 +156,7 @@ const CotizacionesPage = () => {
       ...cotizacion,
       productos: cotizacion.productos.filter(producto => producto.id !== id)
     });
-    
+
     toast.warning("Producto eliminado", {
       style: { backgroundColor: "#FFF8E1", color: "#F59E0B", borderColor: "#F59E0B" },
       icon: <Trash2 className="h-5 w-5 text-amber-500" />,
@@ -172,7 +172,7 @@ const CotizacionesPage = () => {
       });
       return;
     }
-    
+
     generarPDF(cotizacion, () => {
       toast.success("¡PDF generado y descargado correctamente!", {
         style: { backgroundColor: "#E8F5E9", color: "#22C55E", borderColor: "#22C55E" },
@@ -195,7 +195,7 @@ const CotizacionesPage = () => {
     const url = await generarVistaPreviaURL(cotizacion);
     setPdfURL(url);
     setCargandoVistaPrevia(false);
-    
+
     if (!url) {
       toast.error("No se pudo generar la vista previa. Intente de nuevo.", {
         style: { backgroundColor: "#FFEBEE", color: "#EF4444", borderColor: "#EF4444" },
@@ -212,13 +212,13 @@ const CotizacionesPage = () => {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 mt-6">
         {/* Datos del cliente */}
-        <ClienteForm 
-          cotizacion={cotizacion} 
-          onClienteChange={handleClienteChange} 
+        <ClienteForm
+          cotizacion={cotizacion}
+          onClienteChange={handleClienteChange}
         />
 
         {/* Agregar productos */}
-        <ProductoForm 
+        <ProductoForm
           nuevoProducto={nuevoProducto}
           setNuevoProducto={setNuevoProducto}
           agregarProducto={agregarProducto}
@@ -231,23 +231,28 @@ const CotizacionesPage = () => {
       {/* Lista de productos */}
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle>Lista de productos</CardTitle>
+          <CardTitle className="text-base flex items-center gap-2">
+            <span className="inline-flex p-1.5 rounded-full bg-amber-100 text-amber-700">
+              <Hammer size={14} />
+            </span>
+            Lista de productos
+          </CardTitle>
           <CardDescription>
             Productos incluidos en la cotización
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ProductoTable 
+          <ProductoTable
             cotizacion={cotizacion}
             onDeleteProducto={eliminarProducto}
             onEditProducto={editarProducto}
             onSwitchChange={handleSwitchChange}
           />
         </CardContent>
-        
+
         {/* Botones de acción en CardFooter - visible solo en escritorio */}
         <CardFooter className="hidden md:block">
-          <ActionButtons 
+          <ActionButtons
             cotizacion={cotizacion}
             pdfURL={pdfURL}
             cargandoVistaPrevia={cargandoVistaPrevia}
@@ -258,14 +263,13 @@ const CotizacionesPage = () => {
           />
         </CardFooter>
       </Card>
-      
+
       {/* Barra fija en la parte inferior para móviles */}
-      <div className={`fixed bottom-0 left-0 right-0 md:hidden z-40 m-2 p-3 backdrop-blur-sm rounded-xl border shadow-lg transition-colors duration-300 ${
-        cotizacion.productos.length > 0 
-          ? "bg-white/95 border-gray-200" 
+      <div className={`fixed bottom-0 left-0 right-0 md:hidden z-40 m-2 p-3 backdrop-blur-sm rounded-xl border shadow-lg transition-colors duration-300 ${cotizacion.productos.length > 0
+          ? "bg-white/95 border-gray-200"
           : "bg-gray-200/95 border-gray-300"
-      }`}>
-        <ActionButtons 
+        }`}>
+        <ActionButtons
           cotizacion={cotizacion}
           pdfURL={pdfURL}
           cargandoVistaPrevia={cargandoVistaPrevia}
@@ -276,7 +280,7 @@ const CotizacionesPage = () => {
           isMobile={true}
         />
       </div>
-      
+
       {/* Padding adicional para evitar que el contenido quede detrás de la barra fija en móviles */}
       <div className="pb-10 md:pb-0"></div>
     </div>

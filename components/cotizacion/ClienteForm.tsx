@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { User } from "lucide-react";
 import { DatosCotizacion } from "@/components/cotizacion-pdf";
 
 interface ClienteFormProps {
@@ -12,7 +13,12 @@ export const ClienteForm = ({ cotizacion, onClienteChange }: ClienteFormProps) =
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Datos del cliente</CardTitle>
+        <CardTitle className="text-base flex items-center gap-2">
+          <span className="inline-flex p-1.5 rounded-full bg-blue-100 text-blue-700">
+            <User size={14} />
+          </span>
+          Datos del cliente
+        </CardTitle>
         <CardDescription>
           Información del cliente para la cotización
         </CardDescription>
