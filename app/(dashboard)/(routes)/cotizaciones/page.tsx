@@ -50,7 +50,8 @@ const CotizacionesPage = () => {
     cliente: "",
     empresa: "",
     productos: [],
-    aplicarIva: true
+    aplicarIva: true,
+    mostrarDatosBancarios: true
   });
 
   // Estado para controlar la entrada de un nuevo producto
@@ -335,7 +336,7 @@ const CotizacionesPage = () => {
                           variant="outline"
                           size="icon"
                           onClick={() => editarProducto(producto.id)}
-                          className="border-amber-500 hover:bg-amber-100 hover:text-amber-700"
+                          className="border-amber-500 bg-amber-100 hover:text-amber-700"
                         >
                           <Pencil className="h-4 w-4 text-amber-500" />
                         </Button>
@@ -343,7 +344,7 @@ const CotizacionesPage = () => {
                           variant="outline" 
                           size="icon"
                           onClick={() => eliminarProducto(producto.id)}
-                          className="border-red-500 hover:bg-red-100 hover:text-red-700"
+                          className="border-red-500 bg-red-100 hover:text-red-700"
                         >
                           <Trash className="h-4 w-4 text-red-500" />
                         </Button>
@@ -380,17 +381,33 @@ const CotizacionesPage = () => {
             </TableBody>
           </Table>
           
-          <div className="flex items-center justify-end space-x-2 mt-4">
-            <Label htmlFor="aplicar-iva" className="text-sm text-muted-foreground">
-              Aplicar IVA (8%):
-            </Label>
-            <Switch
-              id="aplicar-iva"
-              checked={cotizacion.aplicarIva}
-              onCheckedChange={(checked: boolean) => 
-                setCotizacion({...cotizacion, aplicarIva: checked})
-              }
-            />
+          <div className="flex flex-col sm:flex-row items-end justify-end gap-4 mt-6">
+            <div className="flex items-center space-x-2 w-full sm:w-auto bg-gray-100 border border-gray-200 rounded-md px-3 py-2">
+              <Label htmlFor="aplicar-iva" className="text-sm font-medium text-gray-700">
+                Aplicar IVA (8%):
+              </Label>
+              <Switch
+                id="aplicar-iva"
+                checked={cotizacion.aplicarIva}
+                onCheckedChange={(checked: boolean) => 
+                  setCotizacion({...cotizacion, aplicarIva: checked})
+                }
+                className="data-[state=checked]:bg-emerald-600"
+              />
+            </div>
+            <div className="flex items-center space-x-2 w-full sm:w-auto bg-gray-100 border border-gray-200 rounded-md px-3 py-2">
+              <Label htmlFor="mostrar-datos-bancarios" className="text-sm font-medium text-gray-700">
+                Mostrar datos bancarios:
+              </Label>
+              <Switch
+                id="mostrar-datos-bancarios"
+                checked={cotizacion.mostrarDatosBancarios}
+                onCheckedChange={(checked: boolean) => 
+                  setCotizacion({...cotizacion, mostrarDatosBancarios: checked})
+                }
+                className="data-[state=checked]:bg-emerald-600"
+              />
+            </div>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col md:flex-row gap-4 justify-end p-6">

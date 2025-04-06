@@ -15,6 +15,7 @@ export interface DatosCotizacion {
     empresa?: string;
     productos: ProductoItem[];
     aplicarIva?: boolean;
+    mostrarDatosBancarios?: boolean;
 }
 
 interface CotizacionPDFProps {
@@ -141,13 +142,28 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
         doc.setTextColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
-        doc.text("Rafael Armando Jara Fernandez", pageWidth - margin, 12, { align: "right" });
+        doc.text("Rafael Armando Jara Lazalde", pageWidth - margin, 12, { align: "right" });
         doc.setFontSize(8);
         doc.text("San Luis Río Colorado, Sonora, México", pageWidth - margin, 16, { align: "right" });
 
         // Número de cotización con diseño minimalista
         const numeroReferencia = `COT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
-        const fechaActual = new Date().toLocaleDateString();
+        
+        // Formato de fecha más detallado
+        const obtenerFechaFormateada = () => {
+            const fecha = new Date();
+            const opciones: Intl.DateTimeFormatOptions = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const fechaFormateada = fecha.toLocaleDateString('es-MX', opciones);
+            // Capitalizar primera letra
+            return fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
+        };
+        
+        const fechaActual = obtenerFechaFormateada();
 
         let y = 35;
 
@@ -156,10 +172,15 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
         doc.setTextColor(colorAcento[0], colorAcento[1], colorAcento[2]);
         doc.text("COTIZACIÓN", margin, y);
 
+        // REF a la derecha
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
-        doc.text(`REF: ${numeroReferencia}  |  Fecha: ${fechaActual}`, pageWidth - margin, y, { align: "right" });
+        doc.text(`REF: ${numeroReferencia}`, pageWidth - margin, y, { align: "right" });
+        
+        // Fecha debajo del REF
+        y += 5;
+        doc.text(fechaActual, pageWidth - margin, y, { align: "right" });
 
         // Datos del cliente con diseño minimalista
         y += 20;
@@ -295,31 +316,34 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
         // Datos bancarios justo arriba del separador del footer
         const bancariosY = footerY - 35;
 
-        // Datos bancarios
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(colorAcento[0], colorAcento[1], colorAcento[2]);
-        doc.text("DATOS BANCARIOS", margin, bancariosY);
+        // Solo mostrar datos bancarios si está activada la opción
+        if (cotizacion.mostrarDatosBancarios !== false) {
+            // Datos bancarios
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(colorAcento[0], colorAcento[1], colorAcento[2]);
+            doc.text("DATOS BANCARIOS", margin, bancariosY);
 
-        // Línea horizontal fina
-        doc.setDrawColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
-        doc.setLineWidth(0.2);
-        doc.line(margin, bancariosY + 2, margin + 40, bancariosY + 2);
+            // Línea horizontal fina
+            doc.setDrawColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
+            doc.setLineWidth(0.2);
+            doc.line(margin, bancariosY + 2, margin + 40, bancariosY + 2);
 
-        // Crear un recuadro difuminado para los datos bancarios
-        const recuadroAlto = 25;
-        doc.setFillColor(250, 250, 250); // Fondo muy sutil
-        doc.setDrawColor(colorTerminos[0], colorTerminos[1], colorTerminos[2]); // Borde en gris claro
-        doc.setLineWidth(0.2);
-        doc.roundedRect(margin, bancariosY + 6, pageWidth - (margin * 2), recuadroAlto, 2, 2, 'FD');
+            // Crear un recuadro difuminado para los datos bancarios
+            const recuadroAlto = 25;
+            doc.setFillColor(250, 250, 250); // Fondo muy sutil
+            doc.setDrawColor(colorTerminos[0], colorTerminos[1], colorTerminos[2]); // Borde en gris claro
+            doc.setLineWidth(0.2);
+            doc.roundedRect(margin, bancariosY + 6, pageWidth - (margin * 2), recuadroAlto, 2, 2, 'FD');
 
-        doc.setTextColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
-        doc.setFontSize(8);
-        doc.setFont("helvetica", "normal");
-        doc.text("Banco: BBVA", margin + 5, bancariosY + 11);
-        doc.text("Titular: Rafael Armando Jara Fernandez", margin + 5, bancariosY + 16);
-        doc.text("Cuenta: 1234 5678 9012 3456", margin + 5, bancariosY + 21);
-        doc.text("CLABE: 012 3456 7890 1234 56", margin + 5, bancariosY + 26);
+            doc.setTextColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "normal");
+            doc.text("Banco: BBVA", margin + 5, bancariosY + 11);
+            doc.text("Titular: Rafael Armando Jara Fernandez", margin + 5, bancariosY + 16);
+            doc.text("Cuenta: 1234 5678 9012 3456", margin + 5, bancariosY + 21);
+            doc.text("CLABE: 012 3456 7890 1234 56", margin + 5, bancariosY + 26);
+        }
 
         // Línea del pie de página
         doc.setDrawColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
@@ -395,13 +419,28 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         doc.setTextColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
-        doc.text("Rafael Armando Jara Fernandez", pageWidth - margin, 12, { align: "right" });
+        doc.text("Rafael Armando Jara Lazalde", pageWidth - margin, 12, { align: "right" });
         doc.setFontSize(8);
         doc.text("San Luis Río Colorado, Sonora, México", pageWidth - margin, 16, { align: "right" });
 
         // Número de cotización con diseño minimalista
         const numeroReferencia = `COT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
-        const fechaActual = new Date().toLocaleDateString();
+        
+        // Formato de fecha más detallado
+        const obtenerFechaFormateada = () => {
+            const fecha = new Date();
+            const opciones: Intl.DateTimeFormatOptions = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const fechaFormateada = fecha.toLocaleDateString('es-MX', opciones);
+            // Capitalizar primera letra
+            return fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
+        };
+        
+        const fechaActual = obtenerFechaFormateada();
 
         let y = 35;
 
@@ -410,10 +449,15 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         doc.setTextColor(colorAcento[0], colorAcento[1], colorAcento[2]);
         doc.text("COTIZACIÓN", margin, y);
 
+        // REF a la derecha
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
-        doc.text(`REF: ${numeroReferencia}  |  Fecha: ${fechaActual}`, pageWidth - margin, y, { align: "right" });
+        doc.text(`REF: ${numeroReferencia}`, pageWidth - margin, y, { align: "right" });
+        
+        // Fecha debajo del REF
+        y += 5;
+        doc.text(fechaActual, pageWidth - margin, y, { align: "right" });
 
         // Datos del cliente con diseño minimalista
         y += 20;
@@ -549,31 +593,34 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         // Datos bancarios justo arriba del separador del footer
         const bancariosY = footerY - 35;
 
-        // Datos bancarios
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(colorAcento[0], colorAcento[1], colorAcento[2]);
-        doc.text("DATOS BANCARIOS", margin, bancariosY);
+        // Solo mostrar datos bancarios si está activada la opción
+        if (cotizacion.mostrarDatosBancarios !== false) {
+            // Datos bancarios
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(colorAcento[0], colorAcento[1], colorAcento[2]);
+            doc.text("DATOS BANCARIOS", margin, bancariosY);
 
-        // Línea horizontal fina
-        doc.setDrawColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
-        doc.setLineWidth(0.2);
-        doc.line(margin, bancariosY + 2, margin + 40, bancariosY + 2);
+            // Línea horizontal fina
+            doc.setDrawColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
+            doc.setLineWidth(0.2);
+            doc.line(margin, bancariosY + 2, margin + 40, bancariosY + 2);
 
-        // Crear un recuadro difuminado para los datos bancarios
-        const recuadroAlto = 25;
-        doc.setFillColor(250, 250, 250); // Fondo muy sutil
-        doc.setDrawColor(colorTerminos[0], colorTerminos[1], colorTerminos[2]); // Borde en gris claro
-        doc.setLineWidth(0.2);
-        doc.roundedRect(margin, bancariosY + 6, pageWidth - (margin * 2), recuadroAlto, 2, 2, 'FD');
+            // Crear un recuadro difuminado para los datos bancarios
+            const recuadroAlto = 25;
+            doc.setFillColor(250, 250, 250); // Fondo muy sutil
+            doc.setDrawColor(colorTerminos[0], colorTerminos[1], colorTerminos[2]); // Borde en gris claro
+            doc.setLineWidth(0.2);
+            doc.roundedRect(margin, bancariosY + 6, pageWidth - (margin * 2), recuadroAlto, 2, 2, 'FD');
 
-        doc.setTextColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
-        doc.setFontSize(8);
-        doc.setFont("helvetica", "normal");
-        doc.text("Banco: BBVA", margin + 5, bancariosY + 11);
-        doc.text("Titular: Rafael Armando Jara Fernandez", margin + 5, bancariosY + 16);
-        doc.text("Cuenta: 1234 5678 9012 3456", margin + 5, bancariosY + 21);
-        doc.text("CLABE: 012 3456 7890 1234 56", margin + 5, bancariosY + 26);
+            doc.setTextColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "normal");
+            doc.text("Banco: BBVA", margin + 5, bancariosY + 11);
+            doc.text("Titular: Rafael Armando Jara Fernandez", margin + 5, bancariosY + 16);
+            doc.text("Cuenta: 1234 5678 9012 3456", margin + 5, bancariosY + 21);
+            doc.text("CLABE: 012 3456 7890 1234 56", margin + 5, bancariosY + 26);
+        }
 
         // Línea del pie de página
         doc.setDrawColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
@@ -594,8 +641,8 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         const contactoY = pageHeight - 10;
         doc.setFontSize(7);
         doc.setTextColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
-        doc.text("Tel: (653) 123-4567", margin, contactoY);
-        doc.text("contacto@jara.com", pageWidth / 2, contactoY, { align: "center" });
+        doc.text("Tel: (653) 128 9412", margin, contactoY);
+        doc.text("chuculi77@gmail..com", pageWidth / 2, contactoY, { align: "center" });
         doc.text(`REF: ${numeroReferencia}`, pageWidth - margin, contactoY, { align: "right" });
 
         // Guardar el PDF
