@@ -44,36 +44,6 @@ const SidebarItem = ({
   );
 };
 
-const MobileNavItem = ({
-  icon,
-  label,
-  href,
-  isActive,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  href: string;
-  isActive: boolean;
-}) => {
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "flex flex-col items-center justify-center text-slate-500 transition-all",
-        isActive && "text-slate-900"
-      )}
-    >
-      <div className={cn(
-        "flex items-center justify-center p-1.5 rounded-full",
-        isActive && "bg-slate-100"
-      )}>
-        {icon}
-      </div>
-      <span className="text-xs mt-1">{label}</span>
-    </Link>
-  );
-};
-
 interface AppSidebarProps {
   variant?: "mobile" | "desktop";
 }

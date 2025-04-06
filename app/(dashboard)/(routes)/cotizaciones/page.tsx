@@ -404,7 +404,6 @@ const CotizacionesPage = () => {
           }}>
             <DialogTrigger asChild>
               <Button
-                className="w-full md:w-auto"
                 variant="outline"
                 disabled={cotizacion.productos.length === 0}
               >
