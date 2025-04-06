@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
     Table,
     TableBody,
@@ -12,7 +11,6 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Trash, Pencil, AlertTriangle } from "lucide-react";
-import { toast } from "@/components/ui/sonner";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -44,16 +42,6 @@ export const ProductoTable = ({
     onEditProducto,
     onSwitchChange
 }: ProductoTableProps) => {
-    // Estado para manejar el producto a eliminar
-    const [productoAEliminar, setProductoAEliminar] = useState<string | null>(null);
-
-    // Función para confirmar la eliminación
-    const confirmarEliminacion = () => {
-        if (productoAEliminar) {
-            onDeleteProducto(productoAEliminar);
-            setProductoAEliminar(null);
-        }
-    };
 
     return (
         <>

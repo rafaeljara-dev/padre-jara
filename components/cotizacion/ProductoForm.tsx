@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { PlusCircle, Pencil, Check } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
-import { AlertTriangle, CheckCircle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { ProductoItem } from "@/components/cotizacion-pdf";
 
 interface ProductoFormProps {
