@@ -442,13 +442,75 @@ const CotizacionesPage = () => {
                   <span className="ml-3">Generando vista previa...</span>
                 </div>
               ) : pdfURL ? (
-                <div className="w-full rounded-md overflow-hidden border border-gray-200" style={{height: "70vh"}}>
-                  <iframe 
-                    src={pdfURL} 
-                    className="w-full h-full" 
-                    title="Vista previa de cotización"
-                  />
-                </div>
+                <>
+                  {/* Vista previa del PDF para pantallas grandes */}
+                  <div className="hidden md:block w-full rounded-md overflow-hidden border border-gray-200" style={{height: "70vh"}}>
+                    <iframe 
+                      src={pdfURL} 
+                      className="w-full h-full" 
+                      title="Vista previa de cotización"
+                    />
+                  </div>
+                  
+                  {/* Versión simplificada para dispositivos móviles */}
+                  <div className="block md:hidden space-y-6">
+                    <div className="text-center mb-4">
+                      <h3 className="text-lg font-bold">Cotización</h3>
+                      <p className="text-xs text-muted-foreground">Fecha: {new Date().toLocaleDateString('es-MX', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                      })}</p>
+                      <p className="mt-2 text-xs">REF: COT-{new Date().getFullYear()}-{String(Math.floor(Math.random() * 10000)).padStart(4, '0')}</p>
+                    </div>
+                    
+                    {(cotizacion.cliente || cotizacion.empresa) && (
+                      <div className="bg-gray-50 rounded-md p-3 mb-4">
+                        <h4 className="text-sm font-semibold mb-1">Información del cliente:</h4>
+                        {cotizacion.cliente && <p className="text-sm">{cotizacion.cliente}</p>}
+                        {cotizacion.empresa && <p className="text-sm text-muted-foreground">Empresa: {cotizacion.empresa}</p>}
+                      </div>
+                    )}
+                    
+                    <div className="border rounded-md overflow-hidden">
+                      <div className="bg-gray-100 px-3 py-2">
+                        <h4 className="text-sm font-semibold">Resumen de productos</h4>
+                      </div>
+                      <div className="p-2 space-y-2">
+                        {cotizacion.productos.map((producto) => (
+                          <div key={producto.id} className="border-b pb-2">
+                            <div className="flex justify-between">
+                              <span className="font-medium text-sm">{producto.nombre}</span>
+                              <span className="text-sm">${(producto.cantidad * producto.precio).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                            </div>
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                              <span>{producto.cantidad} x ${producto.precio.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="border-t px-3 py-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Subtotal:</span>
+                          <span>${calcularSubtotal(cotizacion.productos).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>IVA (8%):</span>
+                          <span>{cotizacion.aplicarIva ? `$${calcularIva(cotizacion.productos).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "$0.00"}</span>
+                        </div>
+                        <div className="flex justify-between font-bold mt-1 pt-1 border-t">
+                          <span>Total:</span>
+                          <span>${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 text-center text-xs text-muted-foreground">
+                      <p>Esta es una versión simplificada. Para ver todos los detalles, descargue el PDF.</p>
+                    </div>
+                  </div>
+                </>
               ) : (
                 <div className="py-10 text-center text-muted-foreground">
                   {generarVistaPreviaPDF(cotizacion)}
