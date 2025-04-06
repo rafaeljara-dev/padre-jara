@@ -619,11 +619,6 @@ const CotizacionPDF = ({ cotizacion, onSuccess }: CotizacionPDFProps) => {
         setIsBrowser(true);
     }, []);
 
-    const handleGenerarPDF = async () => {
-        if (!isBrowser) return;
-        await generarPDF(cotizacion, onSuccess);
-    };
-
     return null; // Este componente no renderiza nada, solo proporciona funcionalidad
 };
 
