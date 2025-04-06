@@ -265,7 +265,7 @@ const CotizacionesPage = () => {
       </Card>
 
       {/* Barra fija en la parte inferior para móviles */}
-      <div className={`fixed bottom-0 left-0 right-0 md:hidden z-40 m-2 p-3 backdrop-blur-sm rounded-xl border shadow-lg transition-colors duration-300 ${cotizacion.productos.length > 0
+      <div className={`fixed bottom-0 left-0 right-0 md:hidden z-40 my-2 px-2 py-1.5 backdrop-blur-sm rounded-xl border shadow-lg transition-colors duration-300 ${cotizacion.productos.length > 0
           ? "bg-white/95 border-gray-200"
           : "bg-gray-200/95 border-gray-300"
         }`}>
