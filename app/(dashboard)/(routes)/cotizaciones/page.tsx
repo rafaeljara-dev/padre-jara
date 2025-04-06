@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { 
   Card, 
   CardContent, 
@@ -32,27 +32,26 @@ import {
 } from "@/components/ui/dialog";
 import { Trash, PlusCircle, FileText, Download, Eye } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
+import { Switch } from "@/components/ui/switch";
 
-// Interfaces para los datos
-interface ProductoItem {
-  id: string;
-  nombre: string;
-  cantidad: number;
-  precio: number;
-}
-
-interface DatosCotizacion {
-  cliente: string;
-  empresa: string;
-  productos: ProductoItem[];
-}
+import { 
+  DatosCotizacion, 
+  ProductoItem,
+  calcularTotal,
+  calcularSubtotal,
+  calcularIva,
+  generarPDF,
+  generarVistaPreviaPDF,
+  generarVistaPreviaURL
+} from "@/components/cotizacion-pdf";
 
 const CotizacionesPage = () => {
   // Estado para los datos de la cotización
   const [cotizacion, setCotizacion] = useState<DatosCotizacion>({
     cliente: "",
     empresa: "",
-    productos: []
+    productos: [],
+    aplicarIva: true
   });
 
   // Estado para controlar la entrada de un nuevo producto
@@ -65,13 +64,11 @@ const CotizacionesPage = () => {
   // Estado para controlar el diálogo de vista previa
   const [vistaPrevia, setVistaPrevia] = useState(false);
   
-  // Estado para controlar si el navegador está listo
-  const [isBrowser, setIsBrowser] = useState(false);
-
-  // Verificar si estamos en el navegador
-  useEffect(() => {
-    setIsBrowser(true);
-  }, []);
+  // Estado para almacenar la URL de la vista previa del PDF
+  const [pdfURL, setPdfURL] = useState<string>('');
+  
+  // Estado para indicar si se está cargando la vista previa
+  const [cargandoVistaPrevia, setCargandoVistaPrevia] = useState(false);
 
   // Función para agregar un producto
   const agregarProducto = () => {
@@ -110,143 +107,25 @@ const CotizacionesPage = () => {
     toast.info("Producto eliminado");
   };
 
-  // Calcular el total de la cotización
-  const calcularTotal = () => {
-    return cotizacion.productos.reduce((total, producto) => {
-      return total + (producto.cantidad * producto.precio);
-    }, 0);
-  };
-
-  // Generar la cotización en PDF
-  const generarPDF = async () => {
-    if (!isBrowser || !cotizacion.cliente || cotizacion.productos.length === 0) {
-      toast.error("No se puede generar el PDF. Verifique que ha ingresado el cliente y al menos un producto.");
-      return;
-    }
-
-    // Mostrar toast de carga
-    toast.loading("Generando PDF...");
-
-    try {
-      // Importar jsPDF dinámicamente solo cuando se necesite
-      const jsPDFModule = await import('jspdf');
-      const jsPDF = jsPDFModule.default;
-      
-      // Crear un nuevo documento PDF
-      const doc = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
-
-      // Configuración básica del documento
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const margin = 20;
-      let y = 20;
-
-      // Título
-      doc.setFontSize(22);
-      doc.setFont("helvetica", "bold");
-      doc.text("COTIZACIÓN", pageWidth / 2, y, { align: "center" });
-      y += 10;
-
-      // Fecha
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "normal");
-      const fechaActual = new Date().toLocaleDateString();
-      doc.text(`Fecha: ${fechaActual}`, pageWidth / 2, y, { align: "center" });
-      y += 15;
-
-      // Información del cliente
-      doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
-      doc.text("Datos del cliente:", margin, y);
-      y += 7;
-      
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "normal");
-      doc.text(`Cliente: ${cotizacion.cliente}`, margin, y);
-      y += 7;
-      
-      if (cotizacion.empresa) {
-        doc.text(`Empresa: ${cotizacion.empresa}`, margin, y);
-        y += 7;
-      }
-      
-      y += 10;
-
-      // Tabla de productos manualmente
-      doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
-      doc.text("Productos:", margin, y);
-      y += 10;
-
-      // Crear la tabla manualmente
-      const colWidths = [80, 20, 30, 30]; // Ancho de columnas
-      const startX = margin;
-      const rowHeight = 8;
-      
-      // Encabezados de la tabla
-      doc.setFillColor(220, 220, 220);
-      doc.rect(startX, y, pageWidth - (margin * 2), rowHeight, "F");
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(10);
-      doc.text("Producto", startX + 2, y + 5);
-      doc.text("Cantidad", startX + colWidths[0] + 2, y + 5);
-      doc.text("Precio", startX + colWidths[0] + colWidths[1] + 2, y + 5);
-      doc.text("Subtotal", startX + colWidths[0] + colWidths[1] + colWidths[2] + 2, y + 5);
-      
-      y += rowHeight;
-      
-      // Filas de la tabla
-      doc.setFont("helvetica", "normal");
-      
-      cotizacion.productos.forEach((producto, index) => {
-        // Alternar color de fondo para las filas
-        if (index % 2 === 0) {
-          doc.setFillColor(240, 240, 240);
-          doc.rect(startX, y, pageWidth - (margin * 2), rowHeight, "F");
-        }
-        
-        doc.text(producto.nombre, startX + 2, y + 5);
-        doc.text(producto.cantidad.toString(), startX + colWidths[0] + 2, y + 5);
-        doc.text(`$${producto.precio.toFixed(2)}`, startX + colWidths[0] + colWidths[1] + 2, y + 5);
-        doc.text(`$${(producto.cantidad * producto.precio).toFixed(2)}`, startX + colWidths[0] + colWidths[1] + colWidths[2] + 2, y + 5);
-        
-        y += rowHeight;
-      });
-      
-      // Fila del total
-      doc.setFont("helvetica", "bold");
-      doc.setFillColor(240, 240, 240);
-      doc.rect(startX, y, pageWidth - (margin * 2), rowHeight, "F");
-      doc.text("Total:", startX + colWidths[0] + colWidths[1] + 2, y + 5);
-      doc.text(`$${calcularTotal().toFixed(2)}`, startX + colWidths[0] + colWidths[1] + colWidths[2] + 2, y + 5);
-      
-      y += rowHeight + 10;
-
-      // Pie de página
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "normal");
-      doc.text("Esta cotización es válida por 30 días a partir de la fecha de emisión.", margin, y);
-      doc.text("Gracias por su confianza.", margin, y + 7);
-
-      // Guardar el PDF
-      const nombreArchivo = `Cotizacion_${cotizacion.cliente.replace(/\s+/g, '_')}_${fechaActual.replace(/\//g, '-')}.pdf`;
-      doc.save(nombreArchivo);
-      
-      // Mostrar mensaje de éxito
-      toast.success("¡PDF generado y descargado correctamente!");
-      setVistaPrevia(false);
-    } catch (error) {
-      console.error("Error al generar el PDF:", error);
-      toast.error("Ocurrió un error al generar el PDF. Por favor, inténtelo de nuevo.");
-    }
+  // Para manejar la generación del PDF
+  const handleGenerarPDF = async () => {
+    await generarPDF(cotizacion, () => setVistaPrevia(false));
   };
 
   // Para generar vista previa (sin descargar)
-  const verVistaPreviaPDF = () => {
+  const verVistaPreviaPDF = async () => {
+    setCargandoVistaPrevia(true);
     setVistaPrevia(true);
+    
+    try {
+      const url = await generarVistaPreviaURL(cotizacion);
+      setPdfURL(url);
+    } catch (error) {
+      console.error("Error al generar la vista previa:", error);
+      toast.error("No se pudo generar la vista previa");
+    } finally {
+      setCargandoVistaPrevia(false);
+    }
   };
 
   return (
@@ -387,18 +266,52 @@ const CotizacionesPage = () => {
                 ))
               )}
               {cotizacion.productos.length > 0 && (
-                <TableRow>
-                  <TableCell colSpan={3} className="text-right font-bold">Total:</TableCell>
-                  <TableCell className="font-bold">${calcularTotal().toFixed(2)}</TableCell>
-                  <TableCell></TableCell>
-                </TableRow>
+                <>
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-right font-bold">Subtotal:</TableCell>
+                    <TableCell className="font-medium">${calcularSubtotal(cotizacion.productos).toFixed(2)}</TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                  
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-right font-bold">IVA (8%):</TableCell>
+                    <TableCell className="font-medium">
+                      {cotizacion.aplicarIva 
+                        ? `$${calcularIva(cotizacion.productos).toFixed(2)}` 
+                        : "$0.00"}
+                    </TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                  
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-right font-bold">Total:</TableCell>
+                    <TableCell className="font-bold">${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toFixed(2)}</TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                </>
               )}
             </TableBody>
           </Table>
+          
+          <div className="flex items-center justify-end space-x-2 mt-4">
+            <Label htmlFor="aplicar-iva" className="text-sm text-muted-foreground">
+              Aplicar IVA (8%):
+            </Label>
+            <Switch
+              id="aplicar-iva"
+              checked={cotizacion.aplicarIva}
+              onCheckedChange={(checked: boolean) => 
+                setCotizacion({...cotizacion, aplicarIva: checked})
+              }
+            />
+          </div>
         </CardContent>
         {cotizacion.productos.length > 0 && (
           <CardFooter className="flex flex-wrap gap-2 justify-end">
-            <Dialog open={vistaPrevia} onOpenChange={setVistaPrevia}>
+            <Dialog open={vistaPrevia} onOpenChange={(open) => {
+              setVistaPrevia(open);
+              if (!open) setPdfURL('');
+            }}>
               <DialogTrigger asChild>
                 <Button 
                   variant="outline" 
@@ -410,59 +323,35 @@ const CotizacionesPage = () => {
                   Vista previa
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-3xl">
+              <DialogContent className="max-w-4xl max-h-[90vh]">
                 <DialogHeader>
                   <DialogTitle>Vista previa de cotización</DialogTitle>
                   <DialogDescription>
                     Cotización para {cotizacion.cliente}{cotizacion.empresa ? ` de ${cotizacion.empresa}` : ''}
                   </DialogDescription>
                 </DialogHeader>
-                <div className="p-4 border rounded-lg">
-                  <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold">Cotización</h2>
-                    <p className="text-muted-foreground">Fecha: {new Date().toLocaleDateString()}</p>
+                
+                {cargandoVistaPrevia ? (
+                  <div className="flex items-center justify-center py-20">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                    <span className="ml-3">Generando vista previa...</span>
                   </div>
-                  
-                  <div className="mb-6">
-                    <h3 className="font-bold mb-2">Cliente:</h3>
-                    <p>{cotizacion.cliente}</p>
-                    {cotizacion.empresa && <p>Empresa: {cotizacion.empresa}</p>}
+                ) : pdfURL ? (
+                  <div className="w-full rounded-md overflow-hidden border border-gray-200" style={{height: "70vh"}}>
+                    <iframe 
+                      src={pdfURL} 
+                      className="w-full h-full" 
+                      title="Vista previa de cotización"
+                    />
                   </div>
-                  
-                  <div className="mb-6">
-                    <h3 className="font-bold mb-2">Detalles:</h3>
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-2">Producto</th>
-                          <th className="text-center py-2">Cantidad</th>
-                          <th className="text-right py-2">Precio</th>
-                          <th className="text-right py-2">Subtotal</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {cotizacion.productos.map((item) => (
-                          <tr key={item.id} className="border-b">
-                            <td className="py-2">{item.nombre}</td>
-                            <td className="text-center py-2">{item.cantidad}</td>
-                            <td className="text-right py-2">${item.precio.toFixed(2)}</td>
-                            <td className="text-right py-2">${(item.cantidad * item.precio).toFixed(2)}</td>
-                          </tr>
-                        ))}
-                        <tr>
-                          <td colSpan={3} className="text-right font-bold py-2">Total:</td>
-                          <td className="text-right font-bold py-2">${calcularTotal().toFixed(2)}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                ) : (
+                  <div className="py-10 text-center text-muted-foreground">
+                    {generarVistaPreviaPDF(cotizacion)}
                   </div>
-                  
-                  <div className="text-sm text-muted-foreground">
-                    <p>Esta cotización es válida por 30 días.</p>
-                  </div>
-                </div>
+                )}
+                
                 <DialogFooter>
-                  <Button onClick={generarPDF} className="w-full">
+                  <Button onClick={handleGenerarPDF} className="w-full">
                     <Download className="mr-2 h-4 w-4" />
                     Descargar PDF
                   </Button>
@@ -472,7 +361,7 @@ const CotizacionesPage = () => {
             
             <Button 
               disabled={!cotizacion.cliente || cotizacion.productos.length === 0} 
-              onClick={generarPDF}
+              onClick={handleGenerarPDF}
               className="w-full sm:w-auto"
             >
               <FileText className="mr-2 h-4 w-4" />
