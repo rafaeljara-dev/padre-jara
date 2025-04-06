@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/sonner";
 
 // Interfaces para los datos
