@@ -167,7 +167,7 @@ export const ActionButtons = ({
         variant={"default"}
       >
         <Download className="mr-2 h-4 w-4" />
-        Generar PDF
+        Guardar Cotizacion
       </Button>
     </div>
   );
