@@ -1,5 +1,5 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarIcon, FileTextIcon, TrendingUpIcon, BarChart3Icon } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CalendarIcon, FileTextIcon } from "lucide-react";
 import Link from "next/link";
 
 const DashboardPage = () => {
