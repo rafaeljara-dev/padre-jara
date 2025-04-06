@@ -14,7 +14,7 @@ export default function DashboardLayout({
             <div className="lg:pl-64 h-full">
                 {/* Versión móvil del sidebar */}
                 <AppSidebar />
-                <main className="h-full pt-2 px-4 overflow-y-auto">
+                <main className="h-full pt-2 px-3 overflow-y-auto bg-gray-100">
                     {children}
                 </main>
             </div>

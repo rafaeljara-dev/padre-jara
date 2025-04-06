@@ -137,8 +137,8 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
       </div>
 
       {/* Espaciadores para contenido */}
-      <div className="h-6 lg:hidden" /> {/* Espaciador superior */}
-      <div className="h-8 lg:hidden pb-4" /> {/* Espaciador inferior */}
+      <div className="lg:hidden" /> {/* Espaciador superior */}
+      <div className="lg:hidden pb-12" /> {/* Espaciador inferior */}
     </>
   );
 };

@@ -305,7 +305,7 @@ const CotizacionesPage = () => {
         </CardHeader>
         <CardContent>
           <Table>
-            <TableCaption>Lista de productos para cotización</TableCaption>
+            <TableCaption className="pb-4">Lista de productos para cotización</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>Producto</TableHead>
