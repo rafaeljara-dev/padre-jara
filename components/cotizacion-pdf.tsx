@@ -77,7 +77,7 @@ export const calcularTotal = (productos: ProductoItem[], aplicarIva = false) => 
     const subtotal = productos.reduce((total, producto) => {
         return total + (producto.cantidad * producto.precio);
     }, 0);
-    
+
     return aplicarIva ? subtotal * 1.08 : subtotal;
 };
 
@@ -269,14 +269,14 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
         const subtotal = calcularSubtotal(cotizacion.productos);
         doc.text("SUBTOTAL:", margin + col1Width + col2Width + col3Width - 40, y);
         doc.text(`$${subtotal.toFixed(2)}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
-        
+
         if (cotizacion.aplicarIva) {
             y += 6;
             const iva = calcularIva(cotizacion.productos);
             doc.text("IVA (8%):", margin + col1Width + col2Width + col3Width - 40, y);
             doc.text(`$${iva.toFixed(2)}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
         }
-        
+
         y += 6;
         doc.setFontSize(10);
         doc.text("TOTAL:", margin + col1Width + col2Width + col3Width - 40, y);
@@ -284,7 +284,7 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
 
         // Pie de página minimalista
         const footerY = pageHeight - 25;
-        
+
         // Datos bancarios justo arriba del separador del footer
         const bancariosY = footerY - 35;
 
@@ -526,14 +526,14 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         const subtotal = calcularSubtotal(cotizacion.productos);
         doc.text("SUBTOTAL:", margin + col1Width + col2Width + col3Width - 40, y);
         doc.text(`$${subtotal.toFixed(2)}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
-        
+
         if (cotizacion.aplicarIva) {
             y += 6;
             const iva = calcularIva(cotizacion.productos);
             doc.text("IVA (8%):", margin + col1Width + col2Width + col3Width - 40, y);
             doc.text(`$${iva.toFixed(2)}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
         }
-        
+
         y += 6;
         doc.setFontSize(10);
         doc.text("TOTAL:", margin + col1Width + col2Width + col3Width - 40, y);
@@ -541,7 +541,7 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
 
         // Pie de página minimalista
         const footerY = pageHeight - 25;
-        
+
         // Datos bancarios justo arriba del separador del footer
         const bancariosY = footerY - 35;
 
@@ -612,12 +612,7 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
 };
 
 // Componente para generar PDF (puede ser usado directamente en la UI)
-const CotizacionPDF = ({ cotizacion, onSuccess }: CotizacionPDFProps) => {
-    const [isBrowser, setIsBrowser] = useState(false);
-
-    useEffect(() => {
-        setIsBrowser(true);
-    }, []);
+const CotizacionPDF = ({ }: CotizacionPDFProps) => {
 
     return null; // Este componente no renderiza nada, solo proporciona funcionalidad
 };
