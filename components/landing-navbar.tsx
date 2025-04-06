@@ -20,7 +20,7 @@ export const LandingNavbar = () => {
         <nav className="p-4 bg-white border-b w-full">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
                 <Link href="/" className="font-bold text-xl">
-                    Tu Logo
+                    Bienvenido
                 </Link>
 
                 {/* Navegación desktop */}

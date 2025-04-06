@@ -11,8 +11,8 @@ export interface ProductoItem {
 }
 
 export interface DatosCotizacion {
-    cliente: string;
-    empresa: string;
+    cliente?: string;
+    empresa?: string;
     productos: ProductoItem[];
     aplicarIva?: boolean;
 }
@@ -30,11 +30,13 @@ export const generarVistaPreviaPDF = (cotizacion: DatosCotizacion) => {
                 <p className="text-muted-foreground">Fecha: {new Date().toLocaleDateString()}</p>
             </div>
 
-            <div className="mb-6">
-                <h3 className="font-bold mb-2">Cliente:</h3>
-                <p>{cotizacion.cliente}</p>
-                {cotizacion.empresa && <p>Empresa: {cotizacion.empresa}</p>}
-            </div>
+            {(cotizacion.cliente || cotizacion.empresa) && (
+                <div className="mb-6">
+                    <h3 className="font-bold mb-2">Cliente:</h3>
+                    {cotizacion.cliente && <p>{cotizacion.cliente}</p>}
+                    {cotizacion.empresa && <p>Empresa: {cotizacion.empresa}</p>}
+                </div>
+            )}
 
             <div className="mb-6">
                 <h3 className="font-bold mb-2">Detalles:</h3>
@@ -96,8 +98,8 @@ export const calcularIva = (productos: ProductoItem[]) => {
 // Genera una vista previa del PDF como URL para iframe
 export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promise<string> => {
     // Validar datos
-    if (!cotizacion.cliente || cotizacion.productos.length === 0) {
-        toast.error("No se puede generar la vista previa. Verifique que ha ingresado el cliente y al menos un producto.");
+    if (cotizacion.productos.length === 0) {
+        toast.error("No se puede generar la vista previa. Verifique que ha ingresado al menos un producto.");
         return '';
     }
 
@@ -162,39 +164,45 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
         // Datos del cliente con diseño minimalista
         y += 20;
 
-        // Título de sección
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(colorAcento[0], colorAcento[1], colorAcento[2]);
-        doc.text("INFORMACIÓN DEL CLIENTE", margin, y);
-
-        // Línea horizontal fina debajo del título
-        doc.setDrawColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
-        doc.setLineWidth(0.2);
-        doc.line(margin, y + 2, margin + 60, y + 2);
-
-        y += 10;
-
-        // Datos del cliente
-        doc.setTextColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "bold");
-        doc.text("Cliente:", margin, y);
-        doc.setFont("helvetica", "normal");
-        doc.text(cotizacion.cliente, margin + 30, y);
-
-        if (cotizacion.empresa) {
-            y += 6;
+        // Solo mostramos la sección de información del cliente si hay cliente o empresa
+        if (cotizacion.cliente || cotizacion.empresa) {
+            // Título de sección
+            doc.setFontSize(10);
             doc.setFont("helvetica", "bold");
-            doc.text("Empresa:", margin, y);
-            doc.setFont("helvetica", "normal");
-            doc.text(cotizacion.empresa, margin + 30, y);
-        }
+            doc.setTextColor(colorAcento[0], colorAcento[1], colorAcento[2]);
+            doc.text("INFORMACIÓN DEL CLIENTE", margin, y);
 
-        // Emisor de forma discreta
-        doc.setFontSize(8);
-        doc.setTextColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
-        doc.text("Documento emitido por: Rafael Armando Jara", pageWidth - margin, y - (cotizacion.empresa ? 0 : 6), { align: "right" });
+            // Línea horizontal fina debajo del título
+            doc.setDrawColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
+            doc.setLineWidth(0.2);
+            doc.line(margin, y + 2, margin + 60, y + 2);
+
+            y += 6;
+
+            // Datos del cliente
+            doc.setTextColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
+            doc.setFontSize(9);
+
+            if (cotizacion.cliente) {
+                doc.setFont("helvetica", "bold");
+                doc.text("Cliente:", margin, y);
+                doc.setFont("helvetica", "normal");
+                doc.text(cotizacion.cliente, margin + 30, y);
+            }
+
+            if (cotizacion.empresa) {
+                if (cotizacion.cliente) y += 6;
+                doc.setFont("helvetica", "bold");
+                doc.text("Empresa:", margin, y);
+                doc.setFont("helvetica", "normal");
+                doc.text(cotizacion.empresa, margin + 30, y);
+            }
+
+            // Emisor de forma discreta
+            doc.setFontSize(8);
+            doc.setTextColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
+            doc.text("Documento emitido por: Rafael Armando Jara", pageWidth - margin, y, { align: "right" });
+        }
 
         // Detalles de la cotización
         y += 20;
@@ -279,7 +287,7 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
         y += 6;
         doc.setFontSize(10);
         doc.text("TOTAL:", margin + col1Width + col2Width + col3Width - 40, y);
-        doc.text(`$${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
+        doc.text(`$${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
 
         // Pie de página minimalista
         const footerY = pageHeight - 25;
@@ -349,8 +357,8 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
 
 export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => void) => {
     // Validar datos
-    if (!cotizacion.cliente || cotizacion.productos.length === 0) {
-        toast.error("No se puede generar el PDF. Verifique que ha ingresado el cliente y al menos un producto.");
+    if (cotizacion.productos.length === 0) {
+        toast.error("No se puede generar el PDF. Verifique que ha ingresado al menos un producto.");
         return;
     }
 
@@ -410,39 +418,45 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         // Datos del cliente con diseño minimalista
         y += 20;
 
-        // Título de sección
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(colorAcento[0], colorAcento[1], colorAcento[2]);
-        doc.text("INFORMACIÓN DEL CLIENTE", margin, y);
-
-        // Línea horizontal fina debajo del título
-        doc.setDrawColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
-        doc.setLineWidth(0.2);
-        doc.line(margin, y + 2, margin + 60, y + 2);
-
-        y += 10;
-
-        // Datos del cliente
-        doc.setTextColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "bold");
-        doc.text("Cliente:", margin, y);
-        doc.setFont("helvetica", "normal");
-        doc.text(cotizacion.cliente, margin + 30, y);
-
-        if (cotizacion.empresa) {
-            y += 6;
+        // Solo mostramos la sección de información del cliente si hay cliente o empresa
+        if (cotizacion.cliente || cotizacion.empresa) {
+            // Título de sección
+            doc.setFontSize(10);
             doc.setFont("helvetica", "bold");
-            doc.text("Empresa:", margin, y);
-            doc.setFont("helvetica", "normal");
-            doc.text(cotizacion.empresa, margin + 30, y);
-        }
+            doc.setTextColor(colorAcento[0], colorAcento[1], colorAcento[2]);
+            doc.text("INFORMACIÓN DEL CLIENTE", margin, y);
 
-        // Emisor de forma discreta
-        doc.setFontSize(8);
-        doc.setTextColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
-        doc.text("Documento emitido por: Rafael Armando Jara", pageWidth - margin, y - (cotizacion.empresa ? 0 : 6), { align: "right" });
+            // Línea horizontal fina debajo del título
+            doc.setDrawColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
+            doc.setLineWidth(0.2);
+            doc.line(margin, y + 2, margin + 60, y + 2);
+
+            y += 6;
+
+            // Datos del cliente
+            doc.setTextColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
+            doc.setFontSize(9);
+
+            if (cotizacion.cliente) {
+                doc.setFont("helvetica", "bold");
+                doc.text("Cliente:", margin, y);
+                doc.setFont("helvetica", "normal");
+                doc.text(cotizacion.cliente, margin + 30, y);
+            }
+
+            if (cotizacion.empresa) {
+                if (cotizacion.cliente) y += 6;
+                doc.setFont("helvetica", "bold");
+                doc.text("Empresa:", margin, y);
+                doc.setFont("helvetica", "normal");
+                doc.text(cotizacion.empresa, margin + 30, y);
+            }
+
+            // Emisor de forma discreta
+            doc.setFontSize(8);
+            doc.setTextColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
+            doc.text("Documento emitido por: Rafael Armando Jara", pageWidth - margin, y, { align: "right" });
+        }
 
         // Detalles de la cotización
         y += 20;
@@ -527,7 +541,7 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         y += 6;
         doc.setFontSize(10);
         doc.text("TOTAL:", margin + col1Width + col2Width + col3Width - 40, y);
-        doc.text(`$${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toFixed(2)}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
+        doc.text(`$${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
 
         // Pie de página minimalista
         const footerY = pageHeight - 25;
@@ -585,7 +599,9 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         doc.text(`REF: ${numeroReferencia}`, pageWidth - margin, contactoY, { align: "right" });
 
         // Guardar el PDF
-        const nombreArchivo = `Cotizacion_${cotizacion.cliente.replace(/\s+/g, '_')}_${numeroReferencia}.pdf`;
+        const nombreArchivo = cotizacion.cliente 
+            ? `Cotizacion_${cotizacion.cliente.replace(/\s+/g, '_')}_${numeroReferencia}.pdf` 
+            : `Cotizacion_${numeroReferencia}.pdf`;
         doc.save(nombreArchivo);
 
         // Mostrar mensaje de éxito

@@ -25,12 +25,11 @@ import {
   Dialog, 
   DialogContent, 
   DialogDescription, 
-  DialogFooter, 
   DialogHeader, 
   DialogTitle, 
   DialogTrigger 
 } from "@/components/ui/dialog";
-import { Trash, PlusCircle, FileText, Download, Eye, Pencil } from "lucide-react";
+import { Trash, PlusCircle, Download, Eye, Pencil } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { Switch } from "@/components/ui/switch";
 
@@ -155,25 +154,29 @@ const CotizacionesPage = () => {
     toast.info("Producto eliminado");
   };
 
-  // Para manejar la generación del PDF
-  const handleGenerarPDF = async () => {
-    await generarPDF(cotizacion, () => setVistaPrevia(false));
+  // Función para generar PDF
+  const generarPDFHandler = () => {
+    if (cotizacion.productos.length === 0) {
+      toast.error("No se puede generar el PDF. Agregue al menos un producto.");
+      return;
+    }
+    
+    generarPDF(cotizacion, () => {
+      // Callback de éxito (opcional)
+    });
   };
 
-  // Para generar vista previa (sin descargar)
+  // Función para ver vista previa
   const verVistaPreviaPDF = async () => {
-    setCargandoVistaPrevia(true);
-    setVistaPrevia(true);
-    
-    try {
-      const url = await generarVistaPreviaURL(cotizacion);
-      setPdfURL(url);
-    } catch (error) {
-      console.error("Error al generar la vista previa:", error);
-      toast.error("No se pudo generar la vista previa");
-    } finally {
-      setCargandoVistaPrevia(false);
+    if (cotizacion.productos.length === 0) {
+      toast.error("No se puede generar la vista previa. Agregue al menos un producto.");
+      return;
     }
+
+    setCargandoVistaPrevia(true);
+    const url = await generarVistaPreviaURL(cotizacion);
+    setPdfURL(url);
+    setCargandoVistaPrevia(false);
   };
 
   return (
@@ -188,26 +191,32 @@ const CotizacionesPage = () => {
           <CardHeader>
             <CardTitle>Datos del cliente</CardTitle>
             <CardDescription>
-              Ingrese los datos del cliente para la cotización
+              Información del cliente para la cotización
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="cliente">Nombre del cliente</Label>
-              <Input 
-                id="cliente" 
-                placeholder="Ej. Juan Pérez" 
+            <div className="grid gap-2">
+              <Label htmlFor="cliente">Nombre del cliente (opcional)</Label>
+              <Input
+                id="cliente"
+                placeholder="Nombre del cliente"
                 value={cotizacion.cliente}
-                onChange={(e) => setCotizacion({...cotizacion, cliente: e.target.value})}
+                onChange={(e) => setCotizacion({
+                  ...cotizacion,
+                  cliente: e.target.value
+                })}
               />
             </div>
-            <div className="space-y-2">
+            <div className="grid gap-2">
               <Label htmlFor="empresa">Empresa (opcional)</Label>
-              <Input 
-                id="empresa" 
-                placeholder="Ej. Empresas SA" 
+              <Input
+                id="empresa"
+                placeholder="Nombre de la empresa"
                 value={cotizacion.empresa}
-                onChange={(e) => setCotizacion({...cotizacion, empresa: e.target.value})}
+                onChange={(e) => setCotizacion({
+                  ...cotizacion,
+                  empresa: e.target.value
+                })}
               />
             </div>
           </CardContent>
@@ -384,69 +393,62 @@ const CotizacionesPage = () => {
             />
           </div>
         </CardContent>
-        {cotizacion.productos.length > 0 && (
-          <CardFooter className="flex flex-wrap gap-2 justify-end">
-            <Dialog open={vistaPrevia} onOpenChange={(open) => {
-              setVistaPrevia(open);
-              if (!open) setPdfURL('');
-            }}>
-              <DialogTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  disabled={!cotizacion.cliente}
-                  className="w-full sm:w-auto"
-                  onClick={verVistaPreviaPDF}
-                >
-                  <Eye className="mr-2 h-4 w-4" />
-                  Vista previa
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh]">
-                <DialogHeader>
-                  <DialogTitle>Vista previa de cotización</DialogTitle>
-                  <DialogDescription>
-                    Cotización para {cotizacion.cliente}{cotizacion.empresa ? ` de ${cotizacion.empresa}` : ''}
-                  </DialogDescription>
-                </DialogHeader>
-                
-                {cargandoVistaPrevia ? (
-                  <div className="flex items-center justify-center py-20">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-                    <span className="ml-3">Generando vista previa...</span>
-                  </div>
-                ) : pdfURL ? (
-                  <div className="w-full rounded-md overflow-hidden border border-gray-200" style={{height: "70vh"}}>
-                    <iframe 
-                      src={pdfURL} 
-                      className="w-full h-full" 
-                      title="Vista previa de cotización"
-                    />
-                  </div>
-                ) : (
-                  <div className="py-10 text-center text-muted-foreground">
-                    {generarVistaPreviaPDF(cotizacion)}
-                  </div>
-                )}
-                
-                <DialogFooter>
-                  <Button onClick={handleGenerarPDF} className="w-full">
-                    <Download className="mr-2 h-4 w-4" />
-                    Descargar PDF
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            
-            <Button 
-              disabled={!cotizacion.cliente || cotizacion.productos.length === 0} 
-              onClick={handleGenerarPDF}
-              className="w-full sm:w-auto"
-            >
-              <FileText className="mr-2 h-4 w-4" />
-              Generar PDF
-            </Button>
-          </CardFooter>
-        )}
+        <CardFooter className="flex flex-col md:flex-row gap-4 justify-end p-6">
+          <Dialog open={vistaPrevia} onOpenChange={(open) => {
+            setVistaPrevia(open);
+            if (open && cotizacion.productos.length > 0) {
+              verVistaPreviaPDF();
+            } else if (!open) {
+              setPdfURL('');
+            }
+          }}>
+            <DialogTrigger asChild>
+              <Button
+                className="w-full md:w-auto"
+                variant="outline"
+                disabled={cotizacion.productos.length === 0}
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Vista previa
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-auto">
+              <DialogHeader>
+                <DialogTitle>Vista previa de la cotización</DialogTitle>
+                <DialogDescription>
+                  Previsualización de la cotización antes de generar el PDF
+                </DialogDescription>
+              </DialogHeader>
+              
+              {cargandoVistaPrevia ? (
+                <div className="flex items-center justify-center py-20">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                  <span className="ml-3">Generando vista previa...</span>
+                </div>
+              ) : pdfURL ? (
+                <div className="w-full rounded-md overflow-hidden border border-gray-200" style={{height: "70vh"}}>
+                  <iframe 
+                    src={pdfURL} 
+                    className="w-full h-full" 
+                    title="Vista previa de cotización"
+                  />
+                </div>
+              ) : (
+                <div className="py-10 text-center text-muted-foreground">
+                  {generarVistaPreviaPDF(cotizacion)}
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+          
+          <Button
+            onClick={generarPDFHandler}
+            disabled={cotizacion.productos.length === 0}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Generar PDF
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   );

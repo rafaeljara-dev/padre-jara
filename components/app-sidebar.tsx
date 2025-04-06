@@ -110,9 +110,9 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
       <div className="flex items-center gap-x-2 px-3 py-4">
         <Avatar>
           <AvatarImage src="/logo.png" alt="Logo" />
-          <AvatarFallback>JC</AvatarFallback>
+          <AvatarFallback>RJ</AvatarFallback>
         </Avatar>
-        <div className="font-semibold text-lg">Sistema Cotizaciones</div>
+        <div className="font-semibold text-lg">Bienvenido</div>
       </div>
       <Separator />
       <div className="flex-1 my-4">
@@ -156,11 +156,11 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
             {sidebarContent}
           </SheetContent>
         </Sheet>
-        
+
         <div className="text-center font-semibold text-sm sm:text-base">
-          Sistema Cotizaciones
+          Bienvenido
         </div>
-        
+
         <div className="scale-75 sm:scale-100">
           <UserButton afterSignOutUrl="/" />
         </div>
