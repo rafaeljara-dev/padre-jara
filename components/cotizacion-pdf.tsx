@@ -52,13 +52,13 @@ export const generarVistaPreviaPDF = (cotizacion: DatosCotizacion) => {
                             <tr key={item.id} className="border-b">
                                 <td className="py-2">{item.nombre}</td>
                                 <td className="text-center py-2">{item.cantidad}</td>
-                                <td className="text-right py-2">${item.precio.toFixed(2)}</td>
-                                <td className="text-right py-2">${(item.cantidad * item.precio).toFixed(2)}</td>
+                                <td className="text-right py-2">${item.precio.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                <td className="text-right py-2">${(item.cantidad * item.precio).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                             </tr>
                         ))}
                         <tr>
                             <td colSpan={3} className="text-right font-bold py-2">Total:</td>
-                            <td className="text-right font-bold py-2">${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toFixed(2)}</td>
+                            <td className="text-right font-bold py-2">${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -250,8 +250,8 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
             // Texto
             doc.text(producto.nombre, margin + 5, y + 5);
             doc.text(producto.cantidad.toString(), margin + col1Width + col2Width - 5, y + 5, { align: "right" });
-            doc.text(`$${producto.precio.toFixed(2)}`, margin + col1Width + col2Width + col3Width - 5, y + 5, { align: "right" });
-            doc.text(`$${(producto.cantidad * producto.precio).toFixed(2)}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y + 5, { align: "right" });
+            doc.text(`$${producto.precio.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, margin + col1Width + col2Width + col3Width - 5, y + 5, { align: "right" });
+            doc.text(`$${(producto.cantidad * producto.precio).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y + 5, { align: "right" });
 
             y += altura;
         });
@@ -267,19 +267,19 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
         doc.setFont("helvetica", "bold");
         const subtotal = calcularSubtotal(cotizacion.productos);
         doc.text("SUBTOTAL:", margin + col1Width + col2Width + col3Width - 40, y);
-        doc.text(`$${subtotal.toFixed(2)}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
+        doc.text(`$${subtotal.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
 
         if (cotizacion.aplicarIva) {
             y += 6;
             const iva = calcularIva(cotizacion.productos);
             doc.text("IVA (8%):", margin + col1Width + col2Width + col3Width - 40, y);
-            doc.text(`$${iva.toFixed(2)}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
+            doc.text(`$${iva.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
         }
 
         y += 6;
         doc.setFontSize(10);
         doc.text("TOTAL:", margin + col1Width + col2Width + col3Width - 40, y);
-        doc.text(`$${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toFixed(2)}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
+        doc.text(`$${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
 
         // Pie de página minimalista
         const footerY = pageHeight - 25;
@@ -323,7 +323,7 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
         doc.setFont("helvetica", "normal");
         doc.setTextColor(colorTerminos[0], colorTerminos[1], colorTerminos[2]);
 
-        doc.text("TÉRMINOS Y CONDICIONES: Cotización válida por 30 días • Precios sujetos a cambio sin previo aviso • Se requiere 50% de anticipo",
+        doc.text("CONDICIONES: Cotización válida por 7 dias • Precios sujetos a cambio sin previo aviso.",
             pageWidth / 2, footerY + 5, { align: "center" });
         doc.text(`Tiempo de entrega según disponibilidad • ${cotizacion.aplicarIva ? 'Los precios incluyen IVA (8%)' : 'Los precios no incluyen IVA'}`,
             pageWidth / 2, footerY + 10, { align: "center" });
@@ -354,9 +354,6 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         return;
     }
 
-    // Mostrar toast de carga
-    toast.loading("Generando PDF...");
-
     try {
         // Importar jsPDF dinámicamente solo cuando se necesite
         const jsPDFModule = await import('jspdf');
@@ -385,12 +382,6 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         doc.setDrawColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
         doc.setLineWidth(0.5);
         doc.line(margin, 20, pageWidth - margin, 20);
-
-        // Logo minimalista (solo texto)
-        doc.setTextColor(colorAcento[0], colorAcento[1], colorAcento[2]);
-        doc.setFontSize(16);
-        doc.setFont("helvetica", "bold");
-        doc.text("JARA", margin, 15);
 
         // Información de la empresa en diseño limpio
         doc.setTextColor(colorPrimario[0], colorPrimario[1], colorPrimario[2]);
@@ -507,8 +498,8 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
             // Texto
             doc.text(producto.nombre, margin + 5, y + 5);
             doc.text(producto.cantidad.toString(), margin + col1Width + col2Width - 5, y + 5, { align: "right" });
-            doc.text(`$${producto.precio.toFixed(2)}`, margin + col1Width + col2Width + col3Width - 5, y + 5, { align: "right" });
-            doc.text(`$${(producto.cantidad * producto.precio).toFixed(2)}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y + 5, { align: "right" });
+            doc.text(`$${producto.precio.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, margin + col1Width + col2Width + col3Width - 5, y + 5, { align: "right" });
+            doc.text(`$${(producto.cantidad * producto.precio).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y + 5, { align: "right" });
 
             y += altura;
         });
@@ -524,13 +515,13 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         doc.setFont("helvetica", "bold");
         const subtotal = calcularSubtotal(cotizacion.productos);
         doc.text("SUBTOTAL:", margin + col1Width + col2Width + col3Width - 40, y);
-        doc.text(`$${subtotal.toFixed(2)}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
+        doc.text(`$${subtotal.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
 
         if (cotizacion.aplicarIva) {
             y += 6;
             const iva = calcularIva(cotizacion.productos);
             doc.text("IVA (8%):", margin + col1Width + col2Width + col3Width - 40, y);
-            doc.text(`$${iva.toFixed(2)}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
+            doc.text(`$${iva.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
         }
 
         y += 6;
@@ -576,7 +567,7 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         doc.line(margin, footerY, pageWidth - margin, footerY);
 
         // Términos y condiciones en el pie con color gris claro
-        doc.setFontSize(7.5);
+        doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(colorTerminos[0], colorTerminos[1], colorTerminos[2]);
 

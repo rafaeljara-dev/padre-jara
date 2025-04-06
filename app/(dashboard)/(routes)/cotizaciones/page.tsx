@@ -30,7 +30,7 @@ import {
   DialogTitle, 
   DialogTrigger 
 } from "@/components/ui/dialog";
-import { Trash, PlusCircle, FileText, Download, Eye } from "lucide-react";
+import { Trash, PlusCircle, FileText, Download, Eye, Pencil } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { Switch } from "@/components/ui/switch";
 
@@ -70,6 +70,9 @@ const CotizacionesPage = () => {
   // Estado para indicar si se está cargando la vista previa
   const [cargandoVistaPrevia, setCargandoVistaPrevia] = useState(false);
 
+  // Estado para controlar si estamos editando un producto existente
+  const [productoEnEdicion, setProductoEnEdicion] = useState<string | null>(null);
+
   // Función para agregar un producto
   const agregarProducto = () => {
     if (!nuevoProducto.nombre || nuevoProducto.cantidad <= 0 || nuevoProducto.precio <= 0) {
@@ -77,15 +80,33 @@ const CotizacionesPage = () => {
       return;
     }
 
-    const producto: ProductoItem = {
-      id: Date.now().toString(),
-      ...nuevoProducto
-    };
+    if (productoEnEdicion) {
+      // Estamos editando un producto existente
+      setCotizacion({
+        ...cotizacion,
+        productos: cotizacion.productos.map(p => 
+          p.id === productoEnEdicion 
+            ? { ...nuevoProducto, id: productoEnEdicion } 
+            : p
+        )
+      });
+      
+      setProductoEnEdicion(null);
+      toast.success("Producto actualizado correctamente");
+    } else {
+      // Estamos agregando un nuevo producto
+      const producto: ProductoItem = {
+        id: Date.now().toString(),
+        ...nuevoProducto
+      };
 
-    setCotizacion({
-      ...cotizacion,
-      productos: [...cotizacion.productos, producto]
-    });
+      setCotizacion({
+        ...cotizacion,
+        productos: [...cotizacion.productos, producto]
+      });
+
+      toast.success("Producto agregado correctamente");
+    }
 
     // Resetear el formulario de nuevo producto
     setNuevoProducto({
@@ -93,8 +114,35 @@ const CotizacionesPage = () => {
       cantidad: 1,
       precio: 0
     });
+  };
 
-    toast.success("Producto agregado correctamente");
+  // Función para editar un producto
+  const editarProducto = (id: string) => {
+    const producto = cotizacion.productos.find(p => p.id === id);
+    if (producto) {
+      setNuevoProducto({
+        nombre: producto.nombre,
+        cantidad: producto.cantidad,
+        precio: producto.precio
+      });
+      setProductoEnEdicion(id);
+      
+      // Hacer scroll al formulario de edición
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    }
+  };
+
+  // Función para cancelar la edición
+  const cancelarEdicion = () => {
+    setProductoEnEdicion(null);
+    setNuevoProducto({
+      nombre: "",
+      cantidad: 1,
+      precio: 0
+    });
   };
 
   // Función para eliminar un producto
@@ -168,9 +216,11 @@ const CotizacionesPage = () => {
         {/* Agregar productos */}
         <Card>
           <CardHeader>
-            <CardTitle>Agregar producto</CardTitle>
+            <CardTitle>{productoEnEdicion ? "Editar producto" : "Agregar producto"}</CardTitle>
             <CardDescription>
-              Ingrese los detalles del producto a cotizar
+              {productoEnEdicion 
+                ? "Modifique los detalles del producto seleccionado" 
+                : "Ingrese los detalles del producto a cotizar"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -207,13 +257,30 @@ const CotizacionesPage = () => {
               </div>
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex justify-between">
+            {productoEnEdicion && (
+              <Button 
+                variant="outline"
+                onClick={cancelarEdicion}
+              >
+                Cancelar
+              </Button>
+            )}
             <Button 
-              className="w-full" 
+              className={`${productoEnEdicion ? "bg-amber-500 hover:bg-amber-600" : "w-full"}`}
               onClick={agregarProducto}
             >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Agregar producto
+              {productoEnEdicion ? (
+                <>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Actualizar producto
+                </>
+              ) : (
+                <>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Agregar producto
+                </>
+              )}
             </Button>
           </CardFooter>
         </Card>
@@ -251,16 +318,27 @@ const CotizacionesPage = () => {
                   <TableRow key={producto.id}>
                     <TableCell className="font-medium">{producto.nombre}</TableCell>
                     <TableCell>{producto.cantidad}</TableCell>
-                    <TableCell>${producto.precio.toFixed(2)}</TableCell>
-                    <TableCell>${(producto.cantidad * producto.precio).toFixed(2)}</TableCell>
+                    <TableCell>${producto.precio.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</TableCell>
+                    <TableCell>${(producto.cantidad * producto.precio).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</TableCell>
                     <TableCell className="text-right">
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => eliminarProducto(producto.id)}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
+                      <div className="flex justify-end gap-2">
+                        <Button 
+                          variant="outline"
+                          size="icon"
+                          onClick={() => editarProducto(producto.id)}
+                          className="border-amber-500 hover:bg-amber-100 hover:text-amber-700"
+                        >
+                          <Pencil className="h-4 w-4 text-amber-500" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="icon"
+                          onClick={() => eliminarProducto(producto.id)}
+                          className="border-red-500 hover:bg-red-100 hover:text-red-700"
+                        >
+                          <Trash className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -269,7 +347,7 @@ const CotizacionesPage = () => {
                 <>
                   <TableRow>
                     <TableCell colSpan={3} className="text-right font-bold">Subtotal:</TableCell>
-                    <TableCell className="font-medium">${calcularSubtotal(cotizacion.productos).toFixed(2)}</TableCell>
+                    <TableCell className="font-medium">${calcularSubtotal(cotizacion.productos).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
                   
@@ -277,7 +355,7 @@ const CotizacionesPage = () => {
                     <TableCell colSpan={3} className="text-right font-bold">IVA (8%):</TableCell>
                     <TableCell className="font-medium">
                       {cotizacion.aplicarIva 
-                        ? `$${calcularIva(cotizacion.productos).toFixed(2)}` 
+                        ? `$${calcularIva(cotizacion.productos).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` 
                         : "$0.00"}
                     </TableCell>
                     <TableCell></TableCell>
@@ -285,7 +363,7 @@ const CotizacionesPage = () => {
                   
                   <TableRow>
                     <TableCell colSpan={3} className="text-right font-bold">Total:</TableCell>
-                    <TableCell className="font-bold">${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toFixed(2)}</TableCell>
+                    <TableCell className="font-bold">${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
                 </>
