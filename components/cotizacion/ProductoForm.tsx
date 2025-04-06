@@ -160,29 +160,30 @@ export const ProductoForm = ({
                     </div>
                 </div>
             </CardContent>
-            <CardFooter className="flex justify-between">
+            <CardFooter className="flex justify-end">
                 {productoEnEdicion && (
                     <Button
                         variant="outline"
                         onClick={cancelarEdicion}
+                        className="mr-auto"
                     >
                         Cancelar
                     </Button>
                 )}
                 <Button
-                    className={`relative overflow-hidden ${productoEnEdicion ? "" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
+                    className={`relative overflow-hidden w-44 ${productoEnEdicion ? "" : ""}`}
                     onClick={handleAgregarProducto}
-                    variant={"secondary"}
+                    variant={productoEnEdicion ? "secondary" : "default"}
                 >
-                    <span className={`flex items-center transition-transform duration-300 text-white ${showConfirmation ? "translate-y-[-40px]" : ""}`}>
+                    <span className={`flex items-center justify-center text-white transition-transform duration-300 ${showConfirmation ? "translate-y-[-40px]" : ""}`}>
                         {productoEnEdicion ? (
                             <>
-                                <Pencil className="mr-2 h-4 w-4" />
+                                <Pencil className="mr-1 mt-1 h-4 w-4 " />
                                 Actualizar producto
                             </>
                         ) : (
                             <>
-                                <PlusCircle className="mr-2 h-4 w-4" />
+                                <PlusCircle className="mr-1 mt-1 h-4 w-4" />
                                 Agregar producto
                             </>
                         )}
