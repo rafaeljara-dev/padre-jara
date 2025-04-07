@@ -617,7 +617,7 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
             doc.setFontSize(8);
             doc.setFont("helvetica", "normal");
             doc.text("Banco: BBVA", margin + 5, bancariosY + 11);
-            doc.text("Titular: Rafael Armando Jara Fernandez", margin + 5, bancariosY + 16);
+            doc.text("Titular: Rafael Armando Jara Lazalde", margin + 5, bancariosY + 16);
             doc.text("Cuenta: 1234 5678 9012 3456", margin + 5, bancariosY + 21);
             doc.text("CLABE: 012 3456 7890 1234 56", margin + 5, bancariosY + 26);
         }
