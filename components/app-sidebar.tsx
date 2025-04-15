@@ -73,9 +73,8 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
 
     // Verificar si la app ya está instalada
     const checkIfInstalled = () => {
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        setIsAppInstalled(true);
-      }
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      setIsAppInstalled(isStandalone);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -97,24 +96,39 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
   const installApp = async () => {
     if (!deferredPrompt) {
       toast.error("Tu navegador no soporta la instalación o la app ya está instalada");
+      
+      // Mostrar instrucciones alternativas según el navegador
+      if (navigator.userAgent.includes('Chrome')) {
+        toast.info("Usa el menú del navegador y selecciona 'Instalar aplicación'");
+      } else if (navigator.userAgent.includes('Safari')) {
+        toast.info("Usa el botón 'Compartir' y selecciona 'Añadir a la pantalla de inicio'");
+      }
+      
       return;
     }
 
     // Mostrar el prompt de instalación
-    deferredPrompt.prompt();
-    
-    // Esperar a que el usuario responda al prompt
-    const choiceResult = await deferredPrompt.userChoice;
-    
-    if (choiceResult.outcome === 'accepted') {
-      toast.success("¡Instalación en proceso!");
-    } else {
-      toast.info("Instalación cancelada");
+    try {
+      deferredPrompt.prompt();
+      
+      // Esperar a que el usuario responda al prompt
+      const choiceResult = await deferredPrompt.userChoice;
+      
+      if (choiceResult.outcome === 'accepted') {
+        toast.success("¡Instalación en proceso!");
+      } else {
+        toast.info("Instalación cancelada");
+      }
+    } catch (e) {
+      toast.error("Error al intentar instalar la aplicación");
     }
     
     // Limpiar el prompt guardado
     setDeferredPrompt(null);
   };
+  
+  // Botón de instalación PWA - Visible solo cuando está disponible y no instalada
+  const showInstallButton = deferredPrompt !== null && !isAppInstalled;
 
   if (!isMounted) {
     return null;
@@ -164,8 +178,8 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
       </div>
       <Separator className="bg-sidebar-border" />
       
-      {/* Botón de instalación PWA - Solo se muestra si está disponible y no instalada */}
-      {deferredPrompt && !isAppInstalled && (
+      {/* Botón de instalación PWA - Visible cuando está disponible */}
+      {showInstallButton && (
         <div className="px-3 py-3">
           <Button 
             onClick={installApp} 
