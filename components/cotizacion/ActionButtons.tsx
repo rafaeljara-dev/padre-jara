@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Eye } from "lucide-react";
+import { Download, Eye, Save } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import {
   Dialog,
@@ -21,6 +21,17 @@ interface ActionButtonsProps {
   verVistaPreviaPDF: () => void;
   generarPDFHandler: () => void;
   isMobile?: boolean;
+  nombreCotizacion?: string;
+  setNombreCotizacion?: (nombre: string) => void;
+  setMostrarGuardarDialog?: (mostrar: boolean) => void;
+  cotizacionEnEdicionId?: string | null;
+}
+
+interface CotizacionGuardada extends DatosCotizacion {
+  id: string;
+  fecha: string;
+  nombre: string;
+  referencia: string;
 }
 
 export const ActionButtons = ({
@@ -31,10 +42,16 @@ export const ActionButtons = ({
   setVistaPrevia,
   verVistaPreviaPDF,
   generarPDFHandler,
-  isMobile = false
+  isMobile = false,
+  nombreCotizacion = "",
+  setNombreCotizacion,
+  setMostrarGuardarDialog,
+  cotizacionEnEdicionId = null
 }: ActionButtonsProps) => {
   // Estado para controlar si se ha presionado el área del contenedor
   const [contenedorPresionado, setContenedorPresionado] = useState(false);
+  // Estado para rastrear si ya se ha guardado la cotización actual
+  const [cotizacionGuardada, setCotizacionGuardada] = useState(Boolean(cotizacionEnEdicionId));
 
   // Manejar el clic en el contenedor cuando los botones están deshabilitados
   const handleContenedorClick = () => {
@@ -45,6 +62,115 @@ export const ActionButtons = ({
         onDismiss: () => setContenedorPresionado(false)
       });
       setTimeout(() => setContenedorPresionado(false), 3000);
+    }
+  };
+
+  // Función para guardar en historial automáticamente al generar PDF
+  const handleGenerarPDF = () => {
+    generarPDFHandler();
+
+    // También guardar en historial si hay productos
+    if (cotizacion.productos.length > 0) {
+      // Generar nombre para la cotización basado en el cliente o empresa
+      let nombreGenerado = nombreCotizacion;
+
+      // Si no hay nombre definido manualmente, usamos el cliente o empresa
+      if (!nombreGenerado || nombreGenerado.trim() === '') {
+        if (cotizacion.cliente && cotizacion.cliente.trim() !== '') {
+          nombreGenerado = `${cotizacion.cliente}`;
+        } else if (cotizacion.empresa && cotizacion.empresa.trim() !== '') {
+          nombreGenerado = ` ${cotizacion.empresa}`;
+        } else {
+          nombreGenerado = "Cotización Sin Nombre";
+        }
+      }
+
+      // Crear objeto para guardar
+      const fechaActual = new Date().toISOString();
+      // Usar el ID existente si estamos editando, de lo contrario crear uno nuevo
+      const idCotizacion = cotizacionEnEdicionId || Date.now().toString();
+
+      // Generar una referencia única si no existe
+      const referencia = cotizacion.referencia ||
+        `COT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
+
+      const cotizacionParaGuardar: CotizacionGuardada = {
+        id: idCotizacion,
+        fecha: fechaActual,
+        nombre: nombreGenerado,
+        ...cotizacion,
+        referencia: referencia
+      };
+
+      // Obtener cotizaciones existentes
+      const cotizacionesGuardadasString = localStorage.getItem("cotizaciones");
+      let cotizacionesGuardadas: CotizacionGuardada[] = [];
+
+      if (cotizacionesGuardadasString) {
+        try {
+          cotizacionesGuardadas = JSON.parse(cotizacionesGuardadasString);
+        } catch (error) {
+          console.error("Error al parsear cotizaciones guardadas:", error);
+        }
+      }
+
+      // Verificar si estamos editando o si ya se guardó anteriormente la cotización actual
+      if (cotizacionEnEdicionId) {
+        // Estamos editando, actualizar la existente
+        cotizacionesGuardadas = cotizacionesGuardadas.map(cot =>
+          cot.id === cotizacionEnEdicionId ? cotizacionParaGuardar : cot
+        );
+
+        // Mostrar mensaje
+        toast.success("¡Cotización actualizada en historial!", {
+          duration: 3000
+        });
+      } else if (cotizacionGuardada) {
+        // Ya se guardó anteriormente, identificar por nombre, cliente y productos
+        const cotizacionExistente = cotizacionesGuardadas.find(cot =>
+          (cot.cliente === cotizacion.cliente && cot.empresa === cotizacion.empresa) &&
+          JSON.stringify(cot.productos) === JSON.stringify(cotizacion.productos)
+        );
+
+        if (cotizacionExistente) {
+          // Actualizar la existente
+          cotizacionesGuardadas = cotizacionesGuardadas.map(cot =>
+            cot.id === cotizacionExistente.id ? { ...cotizacionParaGuardar, id: cotizacionExistente.id } : cot
+          );
+
+          // Mostrar mensaje
+          toast.success("¡Cotización actualizada en historial!", {
+            duration: 3000
+          });
+        } else {
+          // Extrañamente no encontramos coincidencia, agregar como nueva
+          cotizacionesGuardadas.push(cotizacionParaGuardar);
+
+          // Mostrar mensaje
+          toast.success("¡Cotización guardada en historial!", {
+            duration: 3000
+          });
+        }
+      } else {
+        // Es nueva, agregarla al array
+        cotizacionesGuardadas.push(cotizacionParaGuardar);
+
+        // Marcar como guardada para evitar duplicados
+        setCotizacionGuardada(true);
+
+        // Mostrar mensaje
+        toast.success("¡Cotización guardada en historial!", {
+          duration: 3000
+        });
+      }
+
+      // Guardar en localStorage
+      localStorage.setItem("cotizaciones", JSON.stringify(cotizacionesGuardadas));
+
+      // Actualizar nombre de cotización en el componente padre si existe
+      if (setNombreCotizacion) {
+        setNombreCotizacion(nombreGenerado);
+      }
     }
   };
 
@@ -69,7 +195,7 @@ export const ActionButtons = ({
             Vista previa
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-auto">
+        <DialogContent className="py-2 max-h-[90vh] overflow-auto justify-center items-center">
           <DialogHeader>
             <DialogTitle>Vista previa de la cotización</DialogTitle>
             <DialogDescription>
@@ -161,13 +287,13 @@ export const ActionButtons = ({
       </Dialog>
 
       <Button
-        onClick={generarPDFHandler}
+        onClick={handleGenerarPDF}
         disabled={cotizacion.productos.length === 0}
         className={`${isMobile ? "flex-1" : ""} bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-600 hover:border-emerald-700 transition-all duration-200 disabled:opacity-60 disabled:pointer-events-none`}
         variant={"default"}
       >
         <Download className="mr-2 h-4 w-4" />
-        Guardar Cotizacion
+        Guardar PDF
       </Button>
     </div>
   );

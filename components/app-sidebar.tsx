@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Menu, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, FileText, Menu, ArrowLeft, History } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -65,13 +65,18 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
   const routes = [
     {
       icon: <LayoutDashboard className="h-5 w-5" />,
-      label: "Dashboard",
+      label: "Inicio",
       href: "/dashboard",
     },
     {
       icon: <FileText className="h-5 w-5" />,
       label: "Cotizaciones",
       href: "/cotizaciones",
+    },
+    {
+      icon: <History className="h-5 w-5" />,
+      label: "Historial",
+      href: "/historial",
     },
   ];
 

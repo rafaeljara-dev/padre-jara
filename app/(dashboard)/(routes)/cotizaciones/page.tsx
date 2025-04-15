@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -9,8 +9,21 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
-import { Trash2, AlertTriangle, CheckCircle, XCircle, FileText, Hammer } from "lucide-react";
+import { Trash2, AlertTriangle, CheckCircle, XCircle, FileText, Hammer, Save, History } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import {
   DatosCotizacion,
@@ -25,7 +38,17 @@ import ProductoForm from "@/components/cotizacion/ProductoForm";
 import ProductoTable from "@/components/cotizacion/ProductoTable";
 import ActionButtons from "@/components/cotizacion/ActionButtons";
 
+// Interfaz para cotización guardada
+interface CotizacionGuardada extends DatosCotizacion {
+  id: string;
+  fecha: string;
+  nombre: string;
+  referencia: string;
+}
+
 const CotizacionesPage = () => {
+  const router = useRouter();
+  
   // Estado para los datos de la cotización
   const [cotizacion, setCotizacion] = useState<DatosCotizacion>({
     cliente: "",
@@ -56,6 +79,66 @@ const CotizacionesPage = () => {
 
   // Estado para animación de confirmación
   const [showConfirmation, setShowConfirmation] = useState(false);
+  
+  // Estado para el diálogo de guardar cotización
+  const [mostrarGuardarDialog, setMostrarGuardarDialog] = useState(false);
+  
+  // Estado para el nombre de la cotización
+  const [nombreCotizacion, setNombreCotizacion] = useState("");
+  
+  // Estado para saber si estamos editando una cotización guardada
+  const [cotizacionEnEdicionId, setCotizacionEnEdicionId] = useState<string | null>(null);
+
+  // Efecto para verificar si hay una cotización a editar
+  useEffect(() => {
+    const cotizacionEditarId = localStorage.getItem("cotizacionEditarId");
+    
+    if (cotizacionEditarId) {
+      cargarCotizacionPorId(cotizacionEditarId);
+      // Limpiar después de cargar
+      localStorage.removeItem("cotizacionEditarId");
+    }
+  }, []);
+
+  // Función para cargar una cotización por su ID
+  const cargarCotizacionPorId = (id: string) => {
+    const cotizacionesGuardadas = localStorage.getItem("cotizaciones");
+    
+    if (cotizacionesGuardadas) {
+      try {
+        const cotizaciones: CotizacionGuardada[] = JSON.parse(cotizacionesGuardadas);
+        const cotizacionEncontrada = cotizaciones.find(c => c.id === id);
+        
+        if (cotizacionEncontrada) {
+          // Cargar la cotización
+          setCotizacion({
+            cliente: cotizacionEncontrada.cliente || "",
+            empresa: cotizacionEncontrada.empresa || "",
+            productos: cotizacionEncontrada.productos,
+            aplicarIva: cotizacionEncontrada.aplicarIva !== undefined ? cotizacionEncontrada.aplicarIva : true,
+            mostrarDatosBancarios: cotizacionEncontrada.mostrarDatosBancarios !== undefined ? cotizacionEncontrada.mostrarDatosBancarios : true
+          });
+          
+          // Establecer el nombre y el ID para edición
+          setNombreCotizacion(cotizacionEncontrada.nombre);
+          setCotizacionEnEdicionId(id);
+          
+          toast.success(`Cotización "${cotizacionEncontrada.nombre}" cargada para edición`, {
+            style: { backgroundColor: "#E8F5E9", color: "#22C55E", borderColor: "#22C55E" },
+            icon: <CheckCircle className="h-5 w-5 text-green-500" />,
+          });
+        } else {
+          toast.error("No se encontró la cotización especificada", {
+            style: { backgroundColor: "#FFEBEE", color: "#EF4444", borderColor: "#EF4444" },
+            icon: <XCircle className="h-5 w-5 text-red-500" />,
+          });
+        }
+      } catch (error) {
+        console.error("Error al cargar la cotización:", error);
+        toast.error("Error al cargar la cotización");
+      }
+    }
+  };
 
   // Función para manejar cambios en los campos del cliente
   const handleClienteChange = (field: string, value: string) => {
@@ -203,11 +286,158 @@ const CotizacionesPage = () => {
       });
     }
   };
+  
+  // Función para guardar cotización
+  const guardarCotizacion = () => {
+    if (cotizacion.productos.length === 0) {
+      toast.error("No se puede guardar la cotización. Agregue al menos un producto.", {
+        style: { backgroundColor: "#FFF8E1", color: "#F59E0B", borderColor: "#F59E0B" },
+        icon: <AlertTriangle className="h-5 w-5 text-amber-500" />,
+      });
+      return;
+    }
+    
+    if (!nombreCotizacion.trim()) {
+      toast.error("Debe asignar un nombre a la cotización.", {
+        style: { backgroundColor: "#FFF8E1", color: "#F59E0B", borderColor: "#F59E0B" },
+        icon: <AlertTriangle className="h-5 w-5 text-amber-500" />,
+      });
+      return;
+    }
+    
+    // Crear objeto para guardar
+    const fechaActual = new Date().toISOString();
+    const idCotizacion = cotizacionEnEdicionId || Date.now().toString();
+    
+    // Generar una referencia única si no existe
+    const referencia = cotizacion.referencia || 
+      `COT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
+    
+    const cotizacionParaGuardar: CotizacionGuardada = {
+      id: idCotizacion,
+      fecha: fechaActual,
+      nombre: nombreCotizacion,
+      ...cotizacion,
+      referencia: referencia
+    };
+    
+    // Obtener cotizaciones existentes
+    const cotizacionesGuardadasString = localStorage.getItem("cotizaciones");
+    let cotizacionesGuardadas: CotizacionGuardada[] = [];
+    
+    if (cotizacionesGuardadasString) {
+      try {
+        cotizacionesGuardadas = JSON.parse(cotizacionesGuardadasString);
+      } catch (error) {
+        console.error("Error al parsear cotizaciones guardadas:", error);
+      }
+    }
+    
+    // Actualizar o agregar la cotización
+    if (cotizacionEnEdicionId) {
+      // Estamos editando, actualizar la existente
+      cotizacionesGuardadas = cotizacionesGuardadas.map(cot => 
+        cot.id === cotizacionEnEdicionId ? cotizacionParaGuardar : cot
+      );
+    } else {
+      // Es nueva, agregarla al array
+      cotizacionesGuardadas.push(cotizacionParaGuardar);
+    }
+    
+    // Guardar en localStorage
+    localStorage.setItem("cotizaciones", JSON.stringify(cotizacionesGuardadas));
+    
+    // Cerrar diálogo y mostrar mensaje
+    setMostrarGuardarDialog(false);
+    
+    toast.success(cotizacionEnEdicionId ? "¡Cotización actualizada correctamente!" : "¡Cotización guardada correctamente!", {
+      style: { backgroundColor: "#E8F5E9", color: "#22C55E", borderColor: "#22C55E" },
+      icon: <CheckCircle className="h-5 w-5 text-green-500" />,
+    });
+  };
+  
+  // Función para limpiar y crear una nueva cotización
+  const nuevaCotizacion = () => {
+    setCotizacion({
+      cliente: "",
+      empresa: "",
+      productos: [],
+      aplicarIva: true,
+      mostrarDatosBancarios: true
+    });
+    setNombreCotizacion("");
+    setCotizacionEnEdicionId(null);
+    
+    toast.success("Nueva cotización creada", {
+      style: { backgroundColor: "#E8F5E9", color: "#22C55E", borderColor: "#22C55E" },
+      icon: <CheckCircle className="h-5 w-5 text-green-500" />,
+    });
+  };
 
   return (
     <div className="flex flex-col pb-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-4">
         <h1 className="text-3xl font-bold tracking-tight">Cotizaciones</h1>
+        
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={nuevaCotizacion}
+            className="flex items-center gap-1"
+          >
+            <FileText className="h-4 w-4" />
+            <span className="hidden md:inline">Nueva</span>
+          </Button>
+          
+          <Dialog open={mostrarGuardarDialog} onOpenChange={setMostrarGuardarDialog}>
+            <DialogTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-1"
+                disabled={cotizacion.productos.length === 0}
+              >
+                <Save className="h-4 w-4" />
+                <span className="hidden md:inline">Guardar</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{cotizacionEnEdicionId ? "Actualizar cotización" : "Guardar cotización"}</DialogTitle>
+                <DialogDescription>
+                  {cotizacionEnEdicionId ? "Actualice los datos de la cotización" : "Asigne un nombre para identificar esta cotización"}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="nombre-cotizacion">Nombre de la cotización</Label>
+                  <Input
+                    id="nombre-cotizacion"
+                    placeholder="Ej. Cotización para Cliente ABC"
+                    value={nombreCotizacion}
+                    onChange={(e) => setNombreCotizacion(e.target.value)}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setMostrarGuardarDialog(false)}>
+                  Cancelar
+                </Button>
+                <Button onClick={guardarCotizacion}>
+                  {cotizacionEnEdicionId ? "Actualizar" : "Guardar"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          
+          <Button 
+            variant="outline"
+            className="flex items-center gap-1"
+            onClick={() => router.push("/historial")}
+          >
+            <History className="h-4 w-4" />
+            <span className="hidden md:inline">Historial</span>
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 mt-6">
@@ -260,6 +490,10 @@ const CotizacionesPage = () => {
             setVistaPrevia={setVistaPrevia}
             verVistaPreviaPDF={verVistaPreviaPDF}
             generarPDFHandler={generarPDFHandler}
+            nombreCotizacion={nombreCotizacion}
+            setNombreCotizacion={setNombreCotizacion}
+            setMostrarGuardarDialog={setMostrarGuardarDialog}
+            cotizacionEnEdicionId={cotizacionEnEdicionId}
           />
         </CardFooter>
       </Card>
@@ -278,6 +512,10 @@ const CotizacionesPage = () => {
           verVistaPreviaPDF={verVistaPreviaPDF}
           generarPDFHandler={generarPDFHandler}
           isMobile={true}
+          nombreCotizacion={nombreCotizacion}
+          setNombreCotizacion={setNombreCotizacion}
+          setMostrarGuardarDialog={setMostrarGuardarDialog}
+          cotizacionEnEdicionId={cotizacionEnEdicionId}
         />
       </div>
 

@@ -1,0 +1,1 @@
+// Este archivo será reemplazado por next-pwa 

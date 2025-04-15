@@ -16,6 +16,7 @@ export interface DatosCotizacion {
     productos: ProductoItem[];
     aplicarIva?: boolean;
     mostrarDatosBancarios?: boolean;
+    referencia?: string;
 }
 
 interface CotizacionPDFProps {
@@ -147,7 +148,8 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
         doc.text("San Luis Río Colorado, Sonora, México", pageWidth - margin, 16, { align: "right" });
 
         // Número de cotización con diseño minimalista
-        const numeroReferencia = `COT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
+        const numeroReferencia = cotizacion.referencia || 
+            `COT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
         
         // Formato de fecha más detallado
         const obtenerFechaFormateada = () => {
@@ -424,7 +426,8 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         doc.text("San Luis Río Colorado, Sonora, México", pageWidth - margin, 16, { align: "right" });
 
         // Número de cotización con diseño minimalista
-        const numeroReferencia = `COT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
+        const numeroReferencia = cotizacion.referencia || 
+            `COT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
         
         // Formato de fecha más detallado
         const obtenerFechaFormateada = () => {
