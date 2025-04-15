@@ -119,7 +119,7 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
       } else {
         toast.info("Instalación cancelada");
       }
-    } catch (e) {
+    } catch (_) {
       toast.error("Error al intentar instalar la aplicación");
     }
     
