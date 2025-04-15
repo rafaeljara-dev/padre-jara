@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Eye, Save } from "lucide-react";
+import { Download, Eye } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import {
   Dialog,
@@ -23,7 +23,6 @@ interface ActionButtonsProps {
   isMobile?: boolean;
   nombreCotizacion?: string;
   setNombreCotizacion?: (nombre: string) => void;
-  setMostrarGuardarDialog?: (mostrar: boolean) => void;
   cotizacionEnEdicionId?: string | null;
 }
 
@@ -45,7 +44,6 @@ export const ActionButtons = ({
   isMobile = false,
   nombreCotizacion = "",
   setNombreCotizacion,
-  setMostrarGuardarDialog,
   cotizacionEnEdicionId = null
 }: ActionButtonsProps) => {
   // Estado para controlar si se ha presionado el área del contenedor

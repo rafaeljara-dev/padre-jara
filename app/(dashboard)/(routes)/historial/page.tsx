@@ -64,8 +64,8 @@ export default function HistorialPage() {
       try {
         const parsed = JSON.parse(cotizacionesGuardadas);
         setCotizaciones(parsed);
-      } catch (error) {
-        console.error("Error al cargar las cotizaciones:", error);
+      } catch (e) {
+        console.error("Error al cargar las cotizaciones:", e);
         toast.error("Error al cargar las cotizaciones");
       }
     }
@@ -393,7 +393,7 @@ export default function HistorialPage() {
                             <AlertDialogHeader>
                               <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Esta acción eliminará la cotización "{cotizacion.nombre}" permanentemente.
+                                Esta acción eliminará la cotización &quot;{cotizacion.nombre}&quot; permanentemente.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>

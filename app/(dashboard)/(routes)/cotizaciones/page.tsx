@@ -492,7 +492,6 @@ const CotizacionesPage = () => {
             generarPDFHandler={generarPDFHandler}
             nombreCotizacion={nombreCotizacion}
             setNombreCotizacion={setNombreCotizacion}
-            setMostrarGuardarDialog={setMostrarGuardarDialog}
             cotizacionEnEdicionId={cotizacionEnEdicionId}
           />
         </CardFooter>
@@ -514,7 +513,6 @@ const CotizacionesPage = () => {
           isMobile={true}
           nombreCotizacion={nombreCotizacion}
           setNombreCotizacion={setNombreCotizacion}
-          setMostrarGuardarDialog={setMostrarGuardarDialog}
           cotizacionEnEdicionId={cotizacionEnEdicionId}
         />
       </div>
