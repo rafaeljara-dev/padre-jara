@@ -620,7 +620,7 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
             doc.setFontSize(8);
             doc.setFont("helvetica", "normal");
             doc.text("Banco: BBVA", margin + 5, bancariosY + 11);
-            doc.text("Titular: Rafael Armando Jara Fernandez", margin + 5, bancariosY + 16);
+            doc.text("Titular: Rafael Armando Jara Lazalde", margin + 5, bancariosY + 16);
             doc.text("Cuenta: 1234 5678 9012 3456", margin + 5, bancariosY + 21);
             doc.text("CLABE: 012 3456 7890 1234 56", margin + 5, bancariosY + 26);
         }
@@ -642,10 +642,10 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
 
         // Información de contacto en el pie
         const contactoY = pageHeight - 10;
-        doc.setFontSize(7);
+        doc.setFontSize(10);
         doc.setTextColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
-        doc.text("Tel: (653) 128 9412", margin, contactoY);
-        doc.text("chuculi77@gmail..com", pageWidth / 2, contactoY, { align: "center" });
+        doc.text("Tel: (653) 849 5703", margin, contactoY);
+        doc.text("chuculi77@gmail.com", pageWidth / 2, contactoY, { align: "center" });
         doc.text(`REF: ${numeroReferencia}`, pageWidth - margin, contactoY, { align: "right" });
 
         // Guardar el PDF
