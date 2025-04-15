@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Menu, History, Download, X } from "lucide-react";
+import { LayoutDashboard, FileText, Menu, History, Download } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { UserButton } from "@clerk/nextjs";
 import { toast } from "@/components/ui/sonner";
+
+// Definir una interfaz para el tipo BeforeInstallPromptEvent
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
 
 interface SidebarItemProps {
   icon: React.ReactNode;
@@ -53,7 +59,7 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
   const pathname = usePathname();
   const [isMounted, setIsMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isAppInstalled, setIsAppInstalled] = useState(false);
 
   // Manejar el evento beforeinstallprompt para la instalación de PWA
@@ -62,7 +68,7 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
       // Prevenir que Chrome muestre el diálogo de instalación por defecto
       e.preventDefault();
       // Guardar el evento para usarlo después
-      setDeferredPrompt(e);
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
 
     // Verificar si la app ya está instalada
