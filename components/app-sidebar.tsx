@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Menu, History } from "lucide-react";
+import { LayoutDashboard, FileText, Menu, History, Download, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { UserButton } from "@clerk/nextjs";
+import { toast } from "@/components/ui/sonner";
 
 interface SidebarItemProps {
   icon: React.ReactNode;
@@ -52,11 +53,62 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
   const pathname = usePathname();
   const [isMounted, setIsMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isAppInstalled, setIsAppInstalled] = useState(false);
 
-  // Evita el error de hidratación
+  // Manejar el evento beforeinstallprompt para la instalación de PWA
   useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      // Prevenir que Chrome muestre el diálogo de instalación por defecto
+      e.preventDefault();
+      // Guardar el evento para usarlo después
+      setDeferredPrompt(e);
+    };
+
+    // Verificar si la app ya está instalada
+    const checkIfInstalled = () => {
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        setIsAppInstalled(true);
+      }
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', () => {
+      setIsAppInstalled(true);
+      setDeferredPrompt(null);
+      toast.success("¡Aplicación instalada correctamente!");
+    });
+    
+    checkIfInstalled();
     setIsMounted(true);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
   }, []);
+
+  // Función para instalar la PWA
+  const installApp = async () => {
+    if (!deferredPrompt) {
+      toast.error("Tu navegador no soporta la instalación o la app ya está instalada");
+      return;
+    }
+
+    // Mostrar el prompt de instalación
+    deferredPrompt.prompt();
+    
+    // Esperar a que el usuario responda al prompt
+    const choiceResult = await deferredPrompt.userChoice;
+    
+    if (choiceResult.outcome === 'accepted') {
+      toast.success("¡Instalación en proceso!");
+    } else {
+      toast.info("Instalación cancelada");
+    }
+    
+    // Limpiar el prompt guardado
+    setDeferredPrompt(null);
+  };
 
   if (!isMounted) {
     return null;
@@ -105,6 +157,20 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
         </div>
       </div>
       <Separator className="bg-sidebar-border" />
+      
+      {/* Botón de instalación PWA - Solo se muestra si está disponible y no instalada */}
+      {deferredPrompt && !isAppInstalled && (
+        <div className="px-3 py-3">
+          <Button 
+            onClick={installApp} 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2 h-10 transition-colors"
+          >
+            <Download className="h-5 w-5" />
+            <span>Guardar App</span>
+          </Button>
+        </div>
+      )}
+      
       <div className="px-3 py-4 flex items-center justify-between">
         <p className="text-sm text-muted-foreground">Mi cuenta</p>
         <UserButton afterSignOutUrl="/" />
