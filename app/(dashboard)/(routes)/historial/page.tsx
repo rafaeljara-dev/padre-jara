@@ -82,7 +82,7 @@ export default function HistorialPage() {
         hour: "2-digit",
         minute: "2-digit",
       });
-    } catch (error) {
+    } catch (e) {
       return "Fecha inválida";
     }
   };
