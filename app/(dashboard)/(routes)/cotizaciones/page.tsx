@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
-import { Trash2, AlertTriangle, CheckCircle, XCircle, FileText, Hammer, Save, History } from "lucide-react";
+import { Trash2, AlertTriangle, CheckCircle, XCircle, FileText, Hammer, Save, History, ArrowLeft } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -48,7 +48,7 @@ interface CotizacionGuardada extends DatosCotizacion {
 
 const CotizacionesPage = () => {
   const router = useRouter();
-  
+
   // Estado para los datos de la cotización
   const [cotizacion, setCotizacion] = useState<DatosCotizacion>({
     cliente: "",
@@ -79,20 +79,20 @@ const CotizacionesPage = () => {
 
   // Estado para animación de confirmación
   const [showConfirmation, setShowConfirmation] = useState(false);
-  
+
   // Estado para el diálogo de guardar cotización
   const [mostrarGuardarDialog, setMostrarGuardarDialog] = useState(false);
-  
+
   // Estado para el nombre de la cotización
   const [nombreCotizacion, setNombreCotizacion] = useState("");
-  
+
   // Estado para saber si estamos editando una cotización guardada
   const [cotizacionEnEdicionId, setCotizacionEnEdicionId] = useState<string | null>(null);
 
   // Efecto para verificar si hay una cotización a editar
   useEffect(() => {
     const cotizacionEditarId = localStorage.getItem("cotizacionEditarId");
-    
+
     if (cotizacionEditarId) {
       cargarCotizacionPorId(cotizacionEditarId);
       // Limpiar después de cargar
@@ -103,12 +103,12 @@ const CotizacionesPage = () => {
   // Función para cargar una cotización por su ID
   const cargarCotizacionPorId = (id: string) => {
     const cotizacionesGuardadas = localStorage.getItem("cotizaciones");
-    
+
     if (cotizacionesGuardadas) {
       try {
         const cotizaciones: CotizacionGuardada[] = JSON.parse(cotizacionesGuardadas);
         const cotizacionEncontrada = cotizaciones.find(c => c.id === id);
-        
+
         if (cotizacionEncontrada) {
           // Cargar la cotización
           setCotizacion({
@@ -118,11 +118,11 @@ const CotizacionesPage = () => {
             aplicarIva: cotizacionEncontrada.aplicarIva !== undefined ? cotizacionEncontrada.aplicarIva : true,
             mostrarDatosBancarios: cotizacionEncontrada.mostrarDatosBancarios !== undefined ? cotizacionEncontrada.mostrarDatosBancarios : true
           });
-          
+
           // Establecer el nombre y el ID para edición
           setNombreCotizacion(cotizacionEncontrada.nombre);
           setCotizacionEnEdicionId(id);
-          
+
           toast.success(`Cotización "${cotizacionEncontrada.nombre}" cargada para edición`, {
             style: { backgroundColor: "#E8F5E9", color: "#22C55E", borderColor: "#22C55E" },
             icon: <CheckCircle className="h-5 w-5 text-green-500" />,
@@ -286,7 +286,7 @@ const CotizacionesPage = () => {
       });
     }
   };
-  
+
   // Función para guardar cotización
   const guardarCotizacion = () => {
     if (cotizacion.productos.length === 0) {
@@ -296,7 +296,7 @@ const CotizacionesPage = () => {
       });
       return;
     }
-    
+
     if (!nombreCotizacion.trim()) {
       toast.error("Debe asignar un nombre a la cotización.", {
         style: { backgroundColor: "#FFF8E1", color: "#F59E0B", borderColor: "#F59E0B" },
@@ -304,15 +304,15 @@ const CotizacionesPage = () => {
       });
       return;
     }
-    
+
     // Crear objeto para guardar
     const fechaActual = new Date().toISOString();
     const idCotizacion = cotizacionEnEdicionId || Date.now().toString();
-    
+
     // Generar una referencia única si no existe
-    const referencia = cotizacion.referencia || 
+    const referencia = cotizacion.referencia ||
       `COT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
-    
+
     const cotizacionParaGuardar: CotizacionGuardada = {
       id: idCotizacion,
       fecha: fechaActual,
@@ -320,11 +320,11 @@ const CotizacionesPage = () => {
       ...cotizacion,
       referencia: referencia
     };
-    
+
     // Obtener cotizaciones existentes
     const cotizacionesGuardadasString = localStorage.getItem("cotizaciones");
     let cotizacionesGuardadas: CotizacionGuardada[] = [];
-    
+
     if (cotizacionesGuardadasString) {
       try {
         cotizacionesGuardadas = JSON.parse(cotizacionesGuardadasString);
@@ -332,30 +332,30 @@ const CotizacionesPage = () => {
         console.error("Error al parsear cotizaciones guardadas:", error);
       }
     }
-    
+
     // Actualizar o agregar la cotización
     if (cotizacionEnEdicionId) {
       // Estamos editando, actualizar la existente
-      cotizacionesGuardadas = cotizacionesGuardadas.map(cot => 
+      cotizacionesGuardadas = cotizacionesGuardadas.map(cot =>
         cot.id === cotizacionEnEdicionId ? cotizacionParaGuardar : cot
       );
     } else {
       // Es nueva, agregarla al array
       cotizacionesGuardadas.push(cotizacionParaGuardar);
     }
-    
+
     // Guardar en localStorage
     localStorage.setItem("cotizaciones", JSON.stringify(cotizacionesGuardadas));
-    
+
     // Cerrar diálogo y mostrar mensaje
     setMostrarGuardarDialog(false);
-    
+
     toast.success(cotizacionEnEdicionId ? "¡Cotización actualizada correctamente!" : "¡Cotización guardada correctamente!", {
       style: { backgroundColor: "#E8F5E9", color: "#22C55E", borderColor: "#22C55E" },
       icon: <CheckCircle className="h-5 w-5 text-green-500" />,
     });
   };
-  
+
   // Función para limpiar y crear una nueva cotización
   const nuevaCotizacion = () => {
     setCotizacion({
@@ -367,7 +367,7 @@ const CotizacionesPage = () => {
     });
     setNombreCotizacion("");
     setCotizacionEnEdicionId(null);
-    
+
     toast.success("Nueva cotización creada", {
       style: { backgroundColor: "#E8F5E9", color: "#22C55E", borderColor: "#22C55E" },
       icon: <CheckCircle className="h-5 w-5 text-green-500" />,
@@ -377,22 +377,32 @@ const CotizacionesPage = () => {
   return (
     <div className="flex flex-col pb-8">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-3xl font-bold tracking-tight">Cotizaciones</h1>
-        
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => router.push("/cotizaciones")}
+            aria-label="Volver a cotizaciones"
+            className="h-10 w-10"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-2xl font-bold">Cotizaciones</h1>
+        </div>
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={nuevaCotizacion}
             className="flex items-center gap-1"
           >
             <FileText className="h-4 w-4" />
             <span className="hidden md:inline">Nueva</span>
           </Button>
-          
+
           <Dialog open={mostrarGuardarDialog} onOpenChange={setMostrarGuardarDialog}>
             <DialogTrigger asChild>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="flex items-center gap-1"
                 disabled={cotizacion.productos.length === 0}
               >
@@ -428,8 +438,8 @@ const CotizacionesPage = () => {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          
-          <Button 
+
+          <Button
             variant="outline"
             className="flex items-center gap-1"
             onClick={() => router.push("/historial")}
@@ -499,8 +509,8 @@ const CotizacionesPage = () => {
 
       {/* Barra fija en la parte inferior para móviles */}
       <div className={`fixed bottom-0 left-0 right-0 md:hidden z-40 my-2 px-2 py-1.5 backdrop-blur-sm rounded-xl border shadow-lg transition-colors duration-300 ${cotizacion.productos.length > 0
-          ? "bg-white/95 border-gray-200"
-          : "bg-gray-200/95 border-gray-300"
+        ? "bg-white/95 border-gray-200"
+        : "bg-gray-200/95 border-gray-300"
         }`}>
         <ActionButtons
           cotizacion={cotizacion}

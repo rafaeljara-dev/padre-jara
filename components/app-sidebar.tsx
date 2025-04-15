@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Menu, ArrowLeft, History } from "lucide-react";
+import { LayoutDashboard, FileText, Menu, History } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -122,20 +122,11 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
       {/* Cabecera móvil */}
       <div className="lg:hidden fixed z-50 flex items-center justify-between px-2 h-12 w-full bg-card border-b border-border">
         <div className="flex items-center gap-2">
-          <Button 
-            variant="secondary" 
-            size="icon" 
-            className="lg:hidden bg-gray-100 border border-gray-200" 
-            onClick={() => window.history.back()}
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button 
-                variant="secondary" 
-                size="icon" 
+              <Button
+                variant="secondary"
+                size="icon"
                 className="lg:hidden bg-gray-100 border border-gray-200"
               >
                 <Menu className="h-5 w-5" />

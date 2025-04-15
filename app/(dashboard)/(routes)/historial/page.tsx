@@ -82,7 +82,8 @@ export default function HistorialPage() {
         hour: "2-digit",
         minute: "2-digit",
       });
-    } catch {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
       return "Fecha inválida";
     }
   };
@@ -153,76 +154,126 @@ export default function HistorialPage() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="icon"
             onClick={() => router.push("/cotizaciones")}
             aria-label="Volver a cotizaciones"
+            className="h-10 w-10"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-2xl font-bold">Historial de Cotizaciones</h1>
         </div>
 
-        <div className="w-full max-w-xs">
-          <Input
-            placeholder="Buscar por nombre, cliente o REF..."
-            value={filtroBusqueda}
-            onChange={(e) => setFiltroBusqueda(e.target.value)}
-            className="max-w-xs"
-          />
+        <div className="relative w-full max-w-lg">
+          <div className="flex items-center bg-white rounded-lg shadow-md border-2 border-blue-200 hover:border-blue-400 transition-all duration-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 overflow-hidden">
+            <div className="p-3 bg-blue-50 text-blue-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+              </svg>
+            </div>
+            <Input
+              placeholder="Buscar por nombre, cliente o REF..."
+              value={filtroBusqueda}
+              onChange={(e) => setFiltroBusqueda(e.target.value)}
+              className="flex-1 h-12 text-base border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pl-2"
+            />
+            {filtroBusqueda && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-12 aspect-square rounded-none border-l border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                onClick={() => setFiltroBusqueda("")}
+                aria-label="Limpiar búsqueda"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.5}
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
       <Card className="border shadow-sm">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl">Cotizaciones guardadas</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-2 p-2">
+          <CardTitle className="text-xl font-bold">Cotizaciones guardadas</CardTitle>
+          <CardDescription className="text-base">
             Historial de todas tus cotizaciones generadas
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableCaption>
+          <div className="overflow-x-auto p-2">
+            <Table className=" border-2 border-gray-200 rounded-lg">
+              <TableCaption className="text-base">
                 {cotizacionesOrdenadas.length === 0
                   ? "No hay cotizaciones guardadas"
                   : `Total de ${cotizacionesOrdenadas.length} cotizaciones`}
               </TableCaption>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[200px]">Cliente</TableHead>
-                  <TableHead className="hidden md:table-cell">Productos</TableHead>
-                  <TableHead className="hidden md:table-cell">Referencia</TableHead>
-                  <TableHead className="hidden lg:table-cell">Total</TableHead>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
+                <TableRow className="bg-gray-100">
+                  <TableHead className="w-[200px] text-base">Cliente</TableHead>
+                  <TableHead className="hidden md:table-cell text-base">Productos</TableHead>
+                  <TableHead className="hidden md:table-cell text-base">Referencia</TableHead>
+                  <TableHead className="hidden lg:table-cell text-base">Total</TableHead>
+                  <TableHead className="hidden md:table-cell text-base">Fecha</TableHead>
+                  <TableHead className="text-right text-base">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {cotizacionesOrdenadas.map((cotizacion) => (
                   <TableRow key={cotizacion.id}>
-                    <TableCell className="font-medium">
-                      {cotizacion.cliente || cotizacion.empresa || "-"}
+                    <TableCell className="font-medium text-base">
+                      <div>
+                        {cotizacion.cliente || cotizacion.empresa || "-"}
+                        <div className="md:hidden mt-1 text-sm">
+                          <span className="rounded-full bg-blue-100 px-2.5 py-1.5 text-blue-700 inline-block">
+                            {formatearFecha(cotizacion.fecha)}
+                          </span>
+                        </div>
+                      </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      <span className="rounded-full bg-amber-100 px-2 py-1  text-amber-700">
+                      <span className="rounded-full bg-amber-100 px-2.5 py-1.5 text-amber-700 text-sm">
                         {cotizacion.productos.length}
                       </span>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell text-xs text-muted-foreground">
+                    <TableCell className="hidden md:table-cell text-sm">
                       {cotizacion.referencia || "-"}
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell">
+                    <TableCell className="hidden lg:table-cell text-base font-medium">
                       ${calcularTotal(cotizacion).toLocaleString("es-MX", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
                     </TableCell>
-                    <TableCell>
-                      <span className="rounded-full bg-blue-100 px-2 py-1 text-blue-700">
+                    <TableCell className="hidden md:table-cell">
+                      <span className="rounded-full bg-blue-100 px-2.5 py-1.5 text-blue-700 text-sm">
                         {formatearFecha(cotizacion.fecha)}
                       </span>
                     </TableCell>
@@ -233,44 +284,44 @@ export default function HistorialPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:text-indigo-800 hover:scale-110 transition-all duration-200 shadow-sm"
+                              className="h-9 w-9 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:text-indigo-800 hover:scale-110 transition-all duration-200 shadow-sm"
                               aria-label="Ver detalles"
                             >
-                              <Eye className="h-4 w-4" />
+                              <Eye className="h-5 w-5" />
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-w-3xl max-h-[90vh] overflow-auto">
                             <DialogHeader>
-                              <DialogTitle>Detalles de la cotización</DialogTitle>
-                              <DialogDescription>
+                              <DialogTitle className="text-xl">Detalles de la cotización</DialogTitle>
+                              <DialogDescription className="text-base">
                                 {cotizacion.nombre} - {formatearFecha(cotizacion.fecha)}
-                                {cotizacion.referencia && <span className="ml-2 text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">REF: {cotizacion.referencia}</span>}
+                                {cotizacion.referencia && <span className="ml-2 text-sm font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">REF: {cotizacion.referencia}</span>}
                               </DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
                               <div className="grid md:grid-cols-2 gap-4">
                                 <div>
-                                  <h3 className="font-medium mb-2">Información del cliente</h3>
-                                  <p className="text-sm">
+                                  <h3 className="font-medium mb-2 text-lg">Información del cliente</h3>
+                                  <p className="text-base">
                                     <strong>Cliente:</strong> {cotizacion.cliente || "-"}
                                   </p>
-                                  <p className="text-sm">
+                                  <p className="text-base">
                                     <strong>Empresa:</strong> {cotizacion.empresa || "-"}
                                   </p>
                                 </div>
                                 <div>
-                                  <h3 className="font-medium mb-2">Configuración</h3>
-                                  <p className="text-sm">
+                                  <h3 className="font-medium mb-2 text-lg">Configuración</h3>
+                                  <p className="text-base">
                                     <strong>Aplicar IVA:</strong> {cotizacion.aplicarIva ? "Sí" : "No"}
                                   </p>
-                                  <p className="text-sm">
+                                  <p className="text-base">
                                     <strong>Datos bancarios:</strong>{" "}
                                     {cotizacion.mostrarDatosBancarios ? "Visibles" : "Ocultos"}
                                   </p>
                                 </div>
                               </div>
                               <div>
-                                <h3 className="font-medium mb-2">Productos</h3>
+                                <h3 className="font-medium mb-2 text-lg">Productos</h3>
                                 <div className="rounded-md border overflow-x-auto">
                                   <Table>
                                     <TableHeader>
@@ -349,9 +400,9 @@ export default function HistorialPage() {
                             <div className="flex justify-end gap-2 mt-4">
                               <Button
                                 onClick={() => regenerarPDF(cotizacion)}
-                                className="flex items-center gap-1 bg-emerald-500 hover:bg-emerald-600 transition-all duration-200"
+                                className="flex items-center gap-1 bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 text-base h-10 px-4"
                               >
-                                <FileText className="h-4 w-4" />
+                                <FileText className="h-5 w-5" />
                                 Generar PDF
                               </Button>
                             </div>
@@ -361,21 +412,21 @@ export default function HistorialPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 bg-amber-100 text-amber-700 hover:bg-amber-200 hover:text-amber-800 hover:scale-110 transition-all duration-200 shadow-sm"
+                          className="h-9 w-9 bg-amber-100 text-amber-700 hover:bg-amber-200 hover:text-amber-800 hover:scale-110 transition-all duration-200 shadow-sm"
                           onClick={() => editarCotizacion(cotizacion.id)}
                           aria-label="Editar cotización"
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil className="h-5 w-5" />
                         </Button>
 
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 hover:text-emerald-800 hover:scale-110 transition-all duration-200 shadow-sm"
+                          className="h-9 w-9 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 hover:text-emerald-800 hover:scale-110 transition-all duration-200 shadow-sm"
                           onClick={() => regenerarPDF(cotizacion)}
                           aria-label="Generar PDF"
                         >
-                          <FileText className="h-4 w-4" />
+                          <FileText className="h-5 w-5" />
                         </Button>
 
                         <AlertDialog>
@@ -383,24 +434,30 @@ export default function HistorialPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 bg-rose-100 text-rose-700 hover:bg-rose-200 hover:text-rose-800 hover:scale-110 transition-all duration-200 shadow-sm"
+                              className="h-9 w-9 bg-rose-100 text-rose-700 hover:bg-rose-200 hover:text-rose-800 hover:scale-110 transition-all duration-200 shadow-sm"
                               aria-label="Eliminar cotización"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-5 w-5" />
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Esta acción eliminará la cotización &quot;{cotizacion.nombre}&quot; permanentemente.
+                              <AlertDialogTitle className="text-xl">
+                                ¿Eliminar esta cotización?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription className="text-base">
+                                Esta acción no se puede deshacer. Esta cotización se
+                                eliminará permanentemente de tus registros.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction 
+                            <AlertDialogFooter className="mt-6">
+                              <AlertDialogCancel className="text-base h-10">
+                                Cancelar
+                              </AlertDialogCancel>
+                              <AlertDialogAction
                                 onClick={() => eliminarCotizacion(cotizacion.id)}
-                                className="bg-rose-600 hover:bg-rose-700 transition-colors">
+                                className="bg-red-500 hover:bg-red-600 text-base h-10"
+                              >
                                 Eliminar
                               </AlertDialogAction>
                             </AlertDialogFooter>
