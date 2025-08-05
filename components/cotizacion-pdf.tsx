@@ -343,7 +343,7 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
             doc.setFont("helvetica", "normal");
             doc.text("Banco: BBVA", margin + 5, bancariosY + 11);
             doc.text("Titular: Rafael Armando Jara Fernandez", margin + 5, bancariosY + 16);
-            doc.text("CLABE Interbancaria: 012 780 004 769 805 384", margin + 5, bancariosY + 26);
+            doc.text("CLABE Interbancaria: 012 780 004 769 805 384", margin + 5, bancariosY + 21);
         }
 
         // Línea del pie de página
@@ -620,8 +620,7 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
             doc.setFont("helvetica", "normal");
             doc.text("Banco: BBVA", margin + 5, bancariosY + 11);
             doc.text("Titular: Rafael Armando Jara Lazalde", margin + 5, bancariosY + 16);
-            doc.text("Cuenta: 1234 5678 9012 3456", margin + 5, bancariosY + 21);
-            doc.text("CLABE: 012 3456 7890 1234 56", margin + 5, bancariosY + 26);
+            doc.text("CLABE Interbancaria: 012 780 004 769 805 384", margin + 5, bancariosY + 21);
         }
 
         // Línea del pie de página
