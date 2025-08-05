@@ -148,23 +148,23 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
         doc.text("San Luis Río Colorado, Sonora, México", pageWidth - margin, 16, { align: "right" });
 
         // Número de cotización con diseño minimalista
-        const numeroReferencia = cotizacion.referencia || 
+        const numeroReferencia = cotizacion.referencia ||
             `COT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
-        
+
         // Formato de fecha más detallado
         const obtenerFechaFormateada = () => {
             const fecha = new Date();
-            const opciones: Intl.DateTimeFormatOptions = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+            const opciones: Intl.DateTimeFormatOptions = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             };
             const fechaFormateada = fecha.toLocaleDateString('es-MX', opciones);
             // Capitalizar primera letra
             return fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
         };
-        
+
         const fechaActual = obtenerFechaFormateada();
 
         let y = 35;
@@ -179,7 +179,7 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
         doc.setFont("helvetica", "normal");
         doc.setTextColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
         doc.text(`REF: ${numeroReferencia}`, pageWidth - margin, y, { align: "right" });
-        
+
         // Fecha debajo del REF
         y += 5;
         doc.text(fechaActual, pageWidth - margin, y, { align: "right" });
@@ -310,7 +310,7 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
         y += 6;
         doc.setFontSize(10);
         doc.text("TOTAL:", margin + col1Width + col2Width + col3Width - 40, y);
-        doc.text(`$${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
+        doc.text(`$${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
 
         // Pie de página minimalista
         const footerY = pageHeight - 25;
@@ -343,8 +343,7 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
             doc.setFont("helvetica", "normal");
             doc.text("Banco: BBVA", margin + 5, bancariosY + 11);
             doc.text("Titular: Rafael Armando Jara Fernandez", margin + 5, bancariosY + 16);
-            doc.text("Cuenta: 1234 5678 9012 3456", margin + 5, bancariosY + 21);
-            doc.text("CLABE: 012 3456 7890 1234 56", margin + 5, bancariosY + 26);
+            doc.text("CLABE Interbancaria: 012 780 004 769 805 384", margin + 5, bancariosY + 26);
         }
 
         // Línea del pie de página
@@ -426,23 +425,23 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         doc.text("San Luis Río Colorado, Sonora, México", pageWidth - margin, 16, { align: "right" });
 
         // Número de cotización con diseño minimalista
-        const numeroReferencia = cotizacion.referencia || 
+        const numeroReferencia = cotizacion.referencia ||
             `COT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
-        
+
         // Formato de fecha más detallado
         const obtenerFechaFormateada = () => {
             const fecha = new Date();
-            const opciones: Intl.DateTimeFormatOptions = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+            const opciones: Intl.DateTimeFormatOptions = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             };
             const fechaFormateada = fecha.toLocaleDateString('es-MX', opciones);
             // Capitalizar primera letra
             return fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
         };
-        
+
         const fechaActual = obtenerFechaFormateada();
 
         let y = 35;
@@ -457,7 +456,7 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         doc.setFont("helvetica", "normal");
         doc.setTextColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
         doc.text(`REF: ${numeroReferencia}`, pageWidth - margin, y, { align: "right" });
-        
+
         // Fecha debajo del REF
         y += 5;
         doc.text(fechaActual, pageWidth - margin, y, { align: "right" });
@@ -588,7 +587,7 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         y += 6;
         doc.setFontSize(10);
         doc.text("TOTAL:", margin + col1Width + col2Width + col3Width - 40, y);
-        doc.text(`$${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
+        doc.text(`$${calcularTotal(cotizacion.productos, cotizacion.aplicarIva).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, margin + col1Width + col2Width + col3Width + col4Width - 5, y, { align: "right" });
 
         // Pie de página minimalista
         const footerY = pageHeight - 25;
@@ -649,8 +648,8 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
         doc.text(`REF: ${numeroReferencia}`, pageWidth - margin, contactoY, { align: "right" });
 
         // Guardar el PDF
-        const nombreArchivo = cotizacion.cliente 
-            ? `Cotizacion_${cotizacion.cliente.replace(/\s+/g, '_')}_${numeroReferencia}.pdf` 
+        const nombreArchivo = cotizacion.cliente
+            ? `Cotizacion_${cotizacion.cliente.replace(/\s+/g, '_')}_${numeroReferencia}.pdf`
             : `Cotizacion_${numeroReferencia}.pdf`;
         doc.save(nombreArchivo);
 
