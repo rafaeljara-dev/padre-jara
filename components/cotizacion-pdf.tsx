@@ -224,7 +224,7 @@ export const generarVistaPreviaURL = async (cotizacion: DatosCotizacion): Promis
             // Emisor de forma discreta
             doc.setFontSize(8);
             doc.setTextColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
-            doc.text("Documento emitido por: Rafael Armando Jara", pageWidth - margin, y, { align: "right" });
+            doc.text("Documento emitido por: Rafael Jara", pageWidth - margin, y, { align: "right" });
         }
 
         // Detalles de la cotización
@@ -501,7 +501,7 @@ export const generarPDF = async (cotizacion: DatosCotizacion, onSuccess?: () => 
             // Emisor de forma discreta
             doc.setFontSize(8);
             doc.setTextColor(colorSecundario[0], colorSecundario[1], colorSecundario[2]);
-            doc.text("Documento emitido por: Rafael Armando Jara", pageWidth - margin, y, { align: "right" });
+            doc.text("Documento emitido por: Rafael Jara", pageWidth - margin, y, { align: "right" });
         }
 
         // Detalles de la cotización
