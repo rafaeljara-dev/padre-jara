@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { UserButton, SignInButton, useUser } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { useState } from "react";
 import { Menu } from "lucide-react";
 
@@ -26,13 +26,16 @@ export const LandingNavbar = () => {
                 {/* Navegación desktop */}
                 <div className="hidden md:flex items-center gap-x-2">
                     <div className="flex items-center gap-x-4">
-                        <Link href="/" className="hover:text-gray-600 transition">
+                        <Link href="/productos" className="hover:text-gray-600 transition">
                             Inicio
+                        </Link>
+                        <Link href="/productos" className="hover:text-gray-600 transition">
+                            Productos
                         </Link>
                     </div>
 
                     <div className="flex items-center gap-x-2 ml-4">
-                        {isSignedIn ? (
+                        {isSignedIn && (
                             <>
                                 <Button asChild variant="default" className="ml-4">
                                     <Link href="/dashboard">
@@ -41,12 +44,6 @@ export const LandingNavbar = () => {
                                 </Button>
                                 <UserButton afterSignOutUrl="/" />
                             </>
-                        ) : (
-                            <SignInButton mode="modal">
-                                <Button>
-                                    Iniciar sesión
-                                </Button>
-                            </SignInButton>
                         )}
                     </div>
                 </div>
@@ -61,8 +58,11 @@ export const LandingNavbar = () => {
                         </SheetTrigger>
                         <SheetContent side="right" className="w-[300px] sm:w-[400px]">
                             <div className="flex flex-col gap-y-4 mt-8">
-                                <Link href="/" className="p-2 hover:bg-gray-100 rounded-md" onClick={closeMenu}>
+                                <Link href="/productos" className="p-2 hover:bg-gray-100 rounded-md" onClick={closeMenu}>
                                     Inicio
+                                </Link>
+                                <Link href="/productos" className="p-2 hover:bg-gray-100 rounded-md" onClick={closeMenu}>
+                                    Productos
                                 </Link>
                                 <Link href="/about" className="p-2 hover:bg-gray-100 rounded-md" onClick={closeMenu}>
                                     Acerca de
@@ -72,7 +72,7 @@ export const LandingNavbar = () => {
                                 </Link>
 
                                 <div className="flex flex-col gap-y-4 pt-4 border-t">
-                                    {isSignedIn ? (
+                                    {isSignedIn && (
                                         <>
                                             <Button asChild variant="default">
                                                 <Link href="/dashboard" onClick={closeMenu}>
@@ -83,12 +83,6 @@ export const LandingNavbar = () => {
                                                 <UserButton afterSignOutUrl="/" />
                                             </div>
                                         </>
-                                    ) : (
-                                        <SignInButton mode="modal">
-                                            <Button className="w-full">
-                                                Iniciar sesión
-                                            </Button>
-                                        </SignInButton>
                                     )}
                                 </div>
                             </div>
