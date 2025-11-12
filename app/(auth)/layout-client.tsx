@@ -4,20 +4,10 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import { Shield, Lock, User, Info } from "lucide-react";
 
-// Tipos para facilitar la personalización
-type SecurityFeature = {
-  icon: React.ElementType;
-  text: string;
-  description: string;
-};
-
 type AuthLayoutClientProps = {
   children: React.ReactNode;
-  // Props opcionales para personalización
   appName?: string;
   appDescription?: string;
-  securityFeatures?: SecurityFeature[];
-  // Textos personalizables
   signUpTitle?: string;
   signUpSubtitle?: string;
   loginTitle?: string;
@@ -26,32 +16,33 @@ type AuthLayoutClientProps = {
   loginFooterText?: string;
 };
 
+const securityFeatures = [
+  {
+    icon: Shield,
+    text: "Seguridad",
+    description: "Protocolos de seguridad avanzados"
+  },
+  {
+    icon: Lock,
+    text: "Datos protegidos",
+    description: "Encriptación de extremo a extremo"
+  },
+  {
+    icon: User,
+    text: "Privacidad",
+    description: "Control sobre tu información"
+  },
+  {
+    icon: Info,
+    text: "Soporte",
+    description: "Asistencia técnica"
+  }
+];
+
 const AuthLayoutClient = ({
   children,
   appName = "App Name",
   appDescription = "Descripción de la aplicación",
-  securityFeatures = [
-    {
-      icon: Shield,
-      text: "Seguridad",
-      description: "Protocolos de seguridad avanzados"
-    },
-    {
-      icon: Lock,
-      text: "Datos protegidos",
-      description: "Encriptación de extremo a extremo"
-    },
-    {
-      icon: User,
-      text: "Privacidad",
-      description: "Control sobre tu información"
-    },
-    {
-      icon: Info,
-      text: "Soporte",
-      description: "Asistencia técnica"
-    }
-  ],
   signUpTitle = "Registrarse",
   signUpSubtitle = "Crea tu cuenta",
   loginTitle = "Iniciar Sesión",
