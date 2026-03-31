@@ -1,8 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarIcon, FileTextIcon, History } from "lucide-react";
+import { CalendarIcon, FileTextIcon, History, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
 
-const DashboardPage = () => {
+const authorizedIds = (process.env.AUTHORIZED_CSF_USER_IDS ?? "")
+  .split(",")
+  .map((id) => id.trim())
+  .filter(Boolean);
+
+const DashboardPage = async () => {
+  const { userId } = await auth();
+  const canViewCSF = userId != null && authorizedIds.includes(userId);
+
   // Obtener la fecha actual en español
   const fechaActual = new Date().toLocaleDateString('es-MX', {
     weekday: 'long',
@@ -46,7 +55,7 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
         </Link>
-        
+
         {/* Card de Historial */}
         <Link href="/historial" className="transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500">
           <Card className="h-full border-indigo-500 bg-gradient-to-br from-indigo-50 to-indigo-100 hover:border-indigo-600 hover:bg-gradient-to-br hover:from-indigo-100 hover:to-indigo-200 hover:shadow-lg shadow-md">
@@ -63,8 +72,30 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
         </Link>
+
+        {/* Card de Constancia CSF — solo visible para el usuario autorizado */}
+        {canViewCSF && (
+          <Link
+            href="/constancia"
+            className="transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          >
+            <Card className="h-full border-emerald-500 bg-gradient-to-br from-emerald-50 to-emerald-100 hover:border-emerald-600 hover:bg-gradient-to-br hover:from-emerald-100 hover:to-emerald-200 hover:shadow-lg shadow-md">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                <CardTitle className="text-xl md:text-2xl font-bold text-emerald-900">Ver Constancia</CardTitle>
+                <div className="p-2 bg-emerald-300 rounded-full transform transition-all duration-300 group-hover:bg-emerald-400">
+                  <ShieldCheck className="h-6 w-6 md:h-7 md:w-7 text-emerald-800" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-base md:text-lg text-emerald-950 font-medium">
+                  Constancia de Situación Fiscal (CSF)
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+        )}
       </div>
-      
+
       {/* Mensaje de ayuda */}
       <div className="mt-6 bg-green-50 border border-green-200 rounded-xl p-4 shadow-sm">
         <p className="text-green-800 text-sm md:text-base">

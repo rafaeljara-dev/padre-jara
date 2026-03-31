@@ -381,8 +381,8 @@ const CotizacionesPage = () => {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => router.push("/cotizaciones")}
-            aria-label="Volver a cotizaciones"
+            onClick={() => router.push("/dashboard")}
+            aria-label="Volver al inicio"
             className="h-10 w-10"
           >
             <ArrowLeft className="h-5 w-5" />

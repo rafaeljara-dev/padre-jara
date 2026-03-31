@@ -159,8 +159,8 @@ export default function HistorialPage() {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => router.push("/cotizaciones")}
-            aria-label="Volver a cotizaciones"
+            onClick={() => router.push("/dashboard")}
+            aria-label="Volver al inicio"
             className="h-10 w-10"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -284,7 +284,7 @@ export default function HistorialPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-9 w-9 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:text-indigo-800 hover:scale-110 transition-all duration-200 shadow-sm"
+                              className="h-12 w-12 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:text-indigo-800 hover:scale-110 transition-all duration-200 shadow-sm"
                               aria-label="Ver detalles"
                             >
                               <Eye className="h-5 w-5" />
@@ -412,7 +412,7 @@ export default function HistorialPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-9 w-9 bg-amber-100 text-amber-700 hover:bg-amber-200 hover:text-amber-800 hover:scale-110 transition-all duration-200 shadow-sm"
+                          className="h-12 w-12 bg-amber-100 text-amber-700 hover:bg-amber-200 hover:text-amber-800 hover:scale-110 transition-all duration-200 shadow-sm"
                           onClick={() => editarCotizacion(cotizacion.id)}
                           aria-label="Editar cotización"
                         >
@@ -422,7 +422,7 @@ export default function HistorialPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-9 w-9 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 hover:text-emerald-800 hover:scale-110 transition-all duration-200 shadow-sm"
+                          className="h-12 w-12 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 hover:text-emerald-800 hover:scale-110 transition-all duration-200 shadow-sm"
                           onClick={() => regenerarPDF(cotizacion)}
                           aria-label="Generar PDF"
                         >
@@ -434,7 +434,7 @@ export default function HistorialPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-9 w-9 bg-rose-100 text-rose-700 hover:bg-rose-200 hover:text-rose-800 hover:scale-110 transition-all duration-200 shadow-sm"
+                              className="h-12 w-12 bg-rose-100 text-rose-700 hover:bg-rose-200 hover:text-rose-800 hover:scale-110 transition-all duration-200 shadow-sm"
                               aria-label="Eliminar cotización"
                             >
                               <Trash2 className="h-5 w-5" />

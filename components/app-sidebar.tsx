@@ -156,7 +156,7 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
     <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-x-2 px-3 py-4">
         <Avatar>
-          <AvatarImage src="/logo.png" alt="Logo" />
+          <AvatarImage src="/icons/favicon-96x96.png" alt="Logo" />
           <AvatarFallback className="bg-primary text-primary-foreground">RJ</AvatarFallback>
         </Avatar>
         <div className="font-semibold text-lg">Bienvenido</div>
@@ -193,7 +193,7 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
       
       <div className="px-3 py-4 flex items-center justify-between">
         <p className="text-sm text-muted-foreground">Mi cuenta</p>
-        <UserButton afterSignOutUrl="/" />
+        <UserButton />
       </div>
     </div>
   );
@@ -224,7 +224,7 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
           </Sheet>
         </div>
 
-        <UserButton afterSignOutUrl="/" />
+        <UserButton />
       </div>
 
       {/* Espaciadores para contenido */}

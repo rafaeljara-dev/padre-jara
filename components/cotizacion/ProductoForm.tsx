@@ -115,7 +115,7 @@ export const ProductoForm = ({
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor="nombreProducto" className={camposConError.nombre ? "text-amber-500 font-medium" : ""}>Nombre del producto</Label>
+                    <Label htmlFor="nombreProducto" className={camposConError.nombre ? "text-base text-amber-500 font-medium" : "text-base"}>Nombre del producto</Label>
                     <Input
                         id="nombreProducto"
                         placeholder="Nombre del producto"
@@ -129,7 +129,7 @@ export const ProductoForm = ({
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="cantidad" className={camposConError.cantidad ? "text-amber-500 font-medium" : ""}>Cantidad</Label>
+                        <Label htmlFor="cantidad" className={camposConError.cantidad ? "text-base text-amber-500 font-medium" : "text-base"}>Cantidad</Label>
                         <Input
                             id="cantidad"
                             type="number"
@@ -144,7 +144,7 @@ export const ProductoForm = ({
                         )}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="precio" className={camposConError.precio ? "text-amber-500 font-medium" : ""}>Precio (MXN)</Label>
+                        <Label htmlFor="precio" className={camposConError.precio ? "text-base text-amber-500 font-medium" : "text-base"}>Precio (MXN)</Label>
                         <Input
                             id="precio"
                             type="number"

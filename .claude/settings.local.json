@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(npm run:*)",
+      "Bash(xargs grep:*)",
+      "Bash(grep -r \"beforeinstallprompt\\\\|pwa\\\\|offline\" /c/Users/rafael/dev/MXN/algodoneros-sanluis/app --include=*.tsx --include=*.ts)",
+      "Bash(grep:*)",
+      "Bash(find /c/Users/rafael/dev/MXN/algodoneros-sanluis/app -name *sw* -o -name *serwist*)",
+      "Bash(ls:*)",
+      "Bash(npm install:*)"
+    ]
+  }
+}

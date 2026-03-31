@@ -108,7 +108,7 @@ ${telefonoCliente ? `Teléfono: ${telefonoCliente}` : ""}`;
             </h2>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
+                <label className="block text-base font-medium text-foreground mb-2">
                   Nombre (opcional)
                 </label>
                 <Input
@@ -119,7 +119,7 @@ ${telefonoCliente ? `Teléfono: ${telefonoCliente}` : ""}`;
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
+                <label className="block text-base font-medium text-foreground mb-2">
                   Teléfono (opcional)
                 </label>
                 <Input

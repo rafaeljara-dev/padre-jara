@@ -42,7 +42,7 @@ export const LandingNavbar = () => {
                                         Ir a plataforma
                                     </Link>
                                 </Button>
-                                <UserButton afterSignOutUrl="/" />
+                                <UserButton />
                             </>
                         )}
                     </div>
@@ -80,7 +80,7 @@ export const LandingNavbar = () => {
                                                 </Link>
                                             </Button>
                                             <div className="flex justify-start pl-2">
-                                                <UserButton afterSignOutUrl="/" />
+                                                <UserButton />
                                             </div>
                                         </>
                                     )}
