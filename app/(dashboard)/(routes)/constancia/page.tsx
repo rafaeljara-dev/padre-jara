@@ -168,29 +168,6 @@ export default function ConstanciaPage() {
       <h2 className="text-xl font-semibold text-gray-900">Enviar a alguien</h2>
 
       <div className="grid gap-4">
-        {/* Compartir */}
-        <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 shadow-md">
-          <CardContent className="p-5">
-            <button
-              onClick={handleCompartir}
-              disabled={sharing}
-              className="w-full flex items-center gap-4 text-left min-h-[64px] active:scale-[0.98] transition-transform disabled:opacity-60"
-            >
-              <div className="p-3 bg-blue-200 rounded-xl shrink-0">
-                <Share2 className="h-7 w-7 text-blue-800" />
-              </div>
-              <div>
-                <p className="text-lg font-bold text-blue-900">
-                  Compartir PDF
-                </p>
-                <p className="text-base text-blue-700">
-                  WhatsApp, correo, Telegram u otra app
-                </p>
-              </div>
-            </button>
-          </CardContent>
-        </Card>
-
         {/* WhatsApp */}
         <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-green-100 shadow-md">
           <CardContent className="p-5">
@@ -214,21 +191,21 @@ export default function ConstanciaPage() {
           </CardContent>
         </Card>
 
-        {/* Correo */}
-        <Card className="border-2 border-violet-200 bg-gradient-to-br from-violet-50 to-violet-100 shadow-md">
+        {/* Correo — rojo */}
+        <Card className="border-2 border-red-200 bg-gradient-to-br from-red-50 to-red-100 shadow-md">
           <CardContent className="p-5">
             <button
               onClick={handleEnviarCorreo}
               className="w-full flex items-center gap-4 text-left min-h-[64px] active:scale-[0.98] transition-transform"
             >
-              <div className="p-3 bg-violet-200 rounded-xl shrink-0">
-                <Mail className="h-7 w-7 text-violet-800" />
+              <div className="p-3 bg-red-200 rounded-xl shrink-0">
+                <Mail className="h-7 w-7 text-red-800" />
               </div>
               <div>
-                <p className="text-lg font-bold text-violet-900">
+                <p className="text-lg font-bold text-red-900">
                   Enviar por Correo
                 </p>
-                <p className="text-base text-violet-700">
+                <p className="text-base text-red-700">
                   Incluye datos para que facturen a {CORREO_FACTURACION}
                 </p>
               </div>
@@ -236,27 +213,41 @@ export default function ConstanciaPage() {
           </CardContent>
         </Card>
 
-        {/* Descargar */}
-        <Card className="border border-gray-200 bg-white shadow-sm">
-          <CardContent className="p-5">
-            <button
-              onClick={handleDescargar}
-              className="w-full flex items-center gap-4 text-left min-h-[64px] active:scale-[0.98] transition-transform"
-            >
-              <div className="p-3 bg-gray-100 rounded-xl shrink-0">
-                <Download className="h-7 w-7 text-gray-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold text-gray-900">
+        {/* Compartir + Descargar juntos al final */}
+        <div className="grid grid-cols-2 gap-3">
+          <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 shadow-md">
+            <CardContent className="p-4">
+              <button
+                onClick={handleCompartir}
+                disabled={sharing}
+                className="w-full flex flex-col items-center gap-2 text-center min-h-[72px] active:scale-[0.98] transition-transform disabled:opacity-60"
+              >
+                <div className="p-2.5 bg-blue-200 rounded-xl">
+                  <Share2 className="h-6 w-6 text-blue-800" />
+                </div>
+                <p className="text-base font-bold text-blue-900 leading-tight">
+                  Compartir PDF
+                </p>
+              </button>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-gray-200 bg-white shadow-sm">
+            <CardContent className="p-4">
+              <button
+                onClick={handleDescargar}
+                className="w-full flex flex-col items-center gap-2 text-center min-h-[72px] active:scale-[0.98] transition-transform"
+              >
+                <div className="p-2.5 bg-gray-100 rounded-xl">
+                  <Download className="h-6 w-6 text-gray-600" />
+                </div>
+                <p className="text-base font-bold text-gray-900 leading-tight">
                   Descargar PDF
                 </p>
-                <p className="text-base text-gray-600">
-                  Guardar en tu dispositivo
-                </p>
-              </div>
-            </button>
-          </CardContent>
-        </Card>
+              </button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 shadow-sm">

@@ -134,6 +134,11 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
     return null;
   }
 
+  // En mobile, solo mostramos el header en /dashboard (las demás páginas tienen su propio header/back)
+  if (variant !== "desktop" && pathname !== "/dashboard") {
+    return null;
+  }
+
   const routes = [
     {
       icon: <LayoutDashboard className="h-5 w-5" />,
@@ -205,20 +210,20 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
 
   return (
     <>
-      {/* Cabecera móvil */}
-      <div className="lg:hidden fixed z-50 flex items-center justify-between px-2 h-12 w-full bg-card border-b border-border">
+      {/* Cabecera móvil — solo visible en /dashboard */}
+      <div className="lg:hidden fixed z-50 flex items-center justify-between px-3 h-14 w-full bg-card border-b border-border">
         <div className="flex items-center gap-2">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="secondary"
                 size="icon"
-                className="lg:hidden bg-gray-100 border border-gray-200"
+                className="lg:hidden h-11 w-11 bg-gray-100 border border-gray-200"
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[250px] p-0">
+            <SheetContent side="left" className="w-[270px] p-0">
               {sidebarContent}
             </SheetContent>
           </Sheet>
@@ -227,9 +232,8 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
         <UserButton />
       </div>
 
-      {/* Espaciadores para contenido */}
-      <div className="lg:hidden" /> {/* Espaciador superior */}
-      <div className="lg:hidden pb-12" /> {/* Espaciador inferior */}
+      {/* Espaciador para que el contenido no quede bajo el header fijo */}
+      <div className="lg:hidden h-14" />
     </>
   );
 };
