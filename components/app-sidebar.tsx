@@ -39,7 +39,7 @@ const SidebarItem = ({
       href={href}
       onClick={onItemClick}
       className={cn(
-        "flex items-center gap-x-2 text-muted-foreground text-sm font-medium px-3 py-2 rounded-lg transition-all hover:text-foreground hover:bg-accent",
+        "flex items-center gap-x-2 text-muted-foreground text-base font-medium px-3 py-3 rounded-lg transition-all hover:text-foreground hover:bg-accent",
         isActive && "text-accent-foreground bg-accent font-semibold"
       )}
     >
@@ -83,7 +83,7 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
       setDeferredPrompt(null);
       toast.success("¡Aplicación instalada correctamente!");
     });
-    
+
     checkIfInstalled();
     setIsMounted(true);
 
@@ -96,24 +96,24 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
   const installApp = async () => {
     if (!deferredPrompt) {
       toast.error("Tu navegador no soporta la instalación o la app ya está instalada");
-      
+
       // Mostrar instrucciones alternativas según el navegador
       if (navigator.userAgent.includes('Chrome')) {
         toast.info("Usa el menú del navegador y selecciona 'Instalar aplicación'");
       } else if (navigator.userAgent.includes('Safari')) {
         toast.info("Usa el botón 'Compartir' y selecciona 'Añadir a la pantalla de inicio'");
       }
-      
+
       return;
     }
 
     // Mostrar el prompt de instalación
     try {
       deferredPrompt.prompt();
-      
+
       // Esperar a que el usuario responda al prompt
       const choiceResult = await deferredPrompt.userChoice;
-      
+
       if (choiceResult.outcome === 'accepted') {
         toast.success("¡Instalación en proceso!");
       } else {
@@ -122,11 +122,11 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
     } catch {
       toast.error("Error al intentar instalar la aplicación");
     }
-    
+
     // Limpiar el prompt guardado
     setDeferredPrompt(null);
   };
-  
+
   // Botón de instalación PWA - Visible solo cuando está disponible y no instalada
   const showInstallButton = deferredPrompt !== null && !isAppInstalled;
 
@@ -177,20 +177,20 @@ export const AppSidebar = ({ variant }: AppSidebarProps) => {
         </div>
       </div>
       <Separator className="bg-sidebar-border" />
-      
+
       {/* Botón de instalación PWA - Visible cuando está disponible */}
       {showInstallButton && (
         <div className="px-3 py-3">
-          <Button 
-            onClick={installApp} 
+          <Button
+            onClick={installApp}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2 h-10 transition-colors"
           >
             <Download className="h-5 w-5" />
-            <span>Guardar App</span>
+            <span>Instalar App</span>
           </Button>
         </div>
       )}
-      
+
       <div className="px-3 py-4 flex items-center justify-between">
         <p className="text-sm text-muted-foreground">Mi cuenta</p>
         <UserButton />
